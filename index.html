@@ -86,6 +86,12 @@
             border-color: var(--primary-light);
         }
 
+        .password-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.3rem;
+        }
+
         .btn {
             width: 100%;
             padding: 0.75rem;
@@ -131,6 +137,22 @@
             gap: 1rem;
         }
 
+        .header-date-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .header-date-box select {
+            padding: 0.35rem 0.6rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
         .user-info {
             display: flex;
             align-items: center;
@@ -138,11 +160,13 @@
             flex-wrap: wrap;
         }
 
-        .user-info input {
-            padding: 0.4rem 0.6rem;
-            border: 1px solid #cbd5e1;
+        .user-badge {
+            background: #e2e8f0;
+            padding: 0.4rem 0.8rem;
             border-radius: 6px;
             font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
         }
 
         .btn-action {
@@ -337,6 +361,13 @@
             gap: 1rem;
             margin-top: 1.5rem;
         }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -348,14 +379,15 @@
             <p>Authorized Personnel Attendance Portal</p>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="username">ተጠቃሚ ስም (Username)</label>
-                    <input type="text" id="username" placeholder="Enter username" value="Admin" required>
+                    <label for="loginUsername">ተጠቃሚ ስም (Username)</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username" value="Admin" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">የመግቢያ ቃል (Password)</label>
-                    <input type="password" id="password" placeholder="Enter password" value="1234">
+                    <label for="loginPassword">የመግቢያ ቃል (Password)</label>
+                    <input type="password" id="loginPassword" placeholder="Enter password" value="Admin123" required>
                 </div>
-                <button type="submit" class="btn">Log In</button>
+                <div class="error-message" id="loginError">ተጠቃሚ ስም ወይም የይለፍ ቃል አልተገኘም። (Invalid Credentials)</div>
+                <button type="submit" class="btn" style="margin-top:1rem;">Log In</button>
             </form>
         </div>
     </div>
@@ -365,11 +397,17 @@
         <header>
             <div>
                 <h2>ፅዱ ቤተሰብ የኣባላት መገኘት መቆጣጠሪያ</h2>
-                <small id="currentDateDisplay" style="color: #64748b;"></small>
+                <div class="header-date-box">
+                    <label style="font-size:0.85rem; font-weight:600; color:#64748b;">ቀን (የኢትዮጵያ ዘመን አቆጣጠር):</label>
+                    <select id="ethDay" onchange="renderTable()"></select>
+                    <select id="ethMonth" onchange="renderTable()"></select>
+                    <select id="ethYear" onchange="renderTable()"></select>
+                </div>
             </div>
             <div class="user-info">
                 <span>ተጠቃሚ:</span>
-                <input type="text" id="loggedInUser" value="Admin" style="width: 120px;" title="Edit user name">
+                <span class="user-badge" id="displayUsername">Admin</span>
+                <button class="btn-action" onclick="openCredsModal()">Change Credentials</button>
                 <button class="btn-action btn-add-member" onclick="openAddMemberModal()">+ Add New Member</button>
                 <button class="btn-action" onclick="logout()">Logout</button>
             </div>
@@ -438,6 +476,7 @@
                 <thead>
                     <tr>
                         <th>ተ.ቁ</th>
+                        <th>ቀን (ዓ.ም)</th>
                         <th>ሙሉ ስም</th>
                         <th>ፆታ</th>
                         <th>የአባልነት ሁኔታ</th>
@@ -453,6 +492,38 @@
 
         <div class="actions-bar">
             <button class="btn-export" onclick="exportCSV()">Export Attendance CSV</button>
+        </div>
+    </div>
+
+    <!-- MODAL: CHANGE CREDENTIALS -->
+    <div class="modal-overlay" id="credsModal">
+        <div class="modal-card">
+            <h3>የመግቢያ መረጃ መቀየሪያ (Change Credentials)</h3>
+            <form id="credsForm">
+                <div class="form-group">
+                    <label for="newUsername">አዲስ ተጠቃሚ ስም (New Username)</label>
+                    <input type="text" id="newUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="currentPassword">ነባር የይለፍ ቃል (Current Password)</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">አዲስ የይለፍ ቃል (New Password)</label>
+                    <input type="password" id="newPassword" required>
+                    <div class="password-hint">Restrictions: Min 6 chars, at least 1 uppercase, 1 lowercase & 1 digit.</div>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">አዲስ የይለፍ ቃል ያረጋግጡ (Confirm New Password)</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="error-message" id="credsError"></div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn">Update Credentials</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCredsModal()">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -509,6 +580,18 @@
     </div>
 
     <script>
+        // System Credentials Store
+        let authCredentials = {
+            username: "Admin",
+            password: "Admin123"
+        };
+
+        // Ethiopian Calendar Month Names
+        const ethMonths = [
+            "መስከረም", "ጥቅምት", "ህዳር", "ታህሳስ", "ጥር", "የካቲት",
+            "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"
+        ];
+
         // Dataset using Amharic gender terms (ሴት / ወንድ) and categories (ሙሉ አባል, እጩ አባል, ደጋፊ አባል)
         const membersData = [
             { id: 1, name: "ወ/ሮ ሊድያ መሀመድ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
@@ -540,26 +623,176 @@
             { id: 27, name: "ወ/ሪት እመቤት አጥላው አበበ", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Absent" }
         ];
 
-        // Direct Login Handler
+        // Gregorian to Ethiopian Date Conversion Logic
+        function getEthiopianDate(gdate = new Date()) {
+            const year = gdate.getFullYear();
+            const month = gdate.getMonth() + 1;
+            const date = gdate.getDate();
+
+            let newYearDay = ((year % 4 === 3) ? 12 : 11);
+            let ethYear = year - 8;
+            if (month < 9 || (month === 9 && date < newYearDay)) {
+                ethYear = year - 8;
+            } else {
+                ethYear = year - 7;
+            }
+
+            // Calculate day offset from Ethiopian New Year (Meskerem 1)
+            const newYearDate = new Date(year, 8, newYearDay); // Sep 11 or 12
+            let diffDays = 0;
+
+            if (gdate >= newYearDate) {
+                diffDays = Math.floor((gdate - newYearDate) / (1000 * 60 * 60 * 24));
+            } else {
+                const prevNewYearDay = (((year - 1) % 4 === 3) ? 12 : 11);
+                const prevNewYearDate = new Date(year - 1, 8, prevNewYearDay);
+                diffDays = Math.floor((gdate - prevNewYearDate) / (1000 * 60 * 60 * 24));
+            }
+
+            let ethMonthIndex = Math.floor(diffDays / 30);
+            let ethDay = (diffDays % 30) + 1;
+
+            if (ethMonthIndex >= 13) ethMonthIndex = 12;
+
+            return {
+                day: ethDay,
+                monthIndex: ethMonthIndex,
+                monthName: ethMonths[ethMonthIndex],
+                year: ethYear
+            };
+        }
+
+        function initEthiopianDateSelectors() {
+            const todayEth = getEthiopianDate(new Date());
+
+            const daySelect = document.getElementById('ethDay');
+            const monthSelect = document.getElementById('ethMonth');
+            const yearSelect = document.getElementById('ethYear');
+
+            daySelect.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = i;
+                if (i === todayEth.day) opt.selected = true;
+                daySelect.appendChild(opt);
+            }
+
+            monthSelect.innerHTML = '';
+            ethMonths.forEach((m, idx) => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.innerText = m;
+                if (idx === todayEth.monthIndex) opt.selected = true;
+                monthSelect.appendChild(opt);
+            });
+
+            yearSelect.innerHTML = '';
+            for (let y = todayEth.year - 5; y <= todayEth.year + 5; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.innerText = `${y} ዓ.ም`;
+                if (y === todayEth.year) opt.selected = true;
+                yearSelect.appendChild(opt);
+            }
+        }
+
+        function getSelectedEthiopianDateString() {
+            const day = document.getElementById('ethDay').value;
+            const month = document.getElementById('ethMonth').value;
+            const year = document.getElementById('ethYear').value;
+            return `${day} ${month} ${year} ዓ.ም`;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initEthiopianDateSelectors();
+        });
+
+        // Login Handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const userVal = document.getElementById('username').value.trim() || 'Admin';
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appScreen').style.display = 'block';
-            document.getElementById('loggedInUser').value = userVal;
-            initApp();
+            const userVal = document.getElementById('loginUsername').value.trim();
+            const passVal = document.getElementById('loginPassword').value;
+            const errorElement = document.getElementById('loginError');
+
+            if (userVal === authCredentials.username && passVal === authCredentials.password) {
+                errorElement.style.display = 'none';
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appScreen').style.display = 'block';
+                document.getElementById('displayUsername').innerText = authCredentials.username;
+                initApp();
+            } else {
+                errorElement.innerText = "የተሳሳተ ተጠቃሚ ስም ወይም የይለፍ ቃል! (Invalid username or password)";
+                errorElement.style.display = 'block';
+            }
         });
 
         function logout() {
             document.getElementById('appScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginPassword').value = '';
         }
 
         function initApp() {
-            const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('currentDateDisplay').innerText = `Date: ${today}`;
             renderTable();
         }
+
+        /* Credentials Management Modal & Restrictions */
+        function openCredsModal() {
+            document.getElementById('credsModal').style.display = 'flex';
+            document.getElementById('newUsername').value = authCredentials.username;
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('credsError').style.display = 'none';
+        }
+
+        function closeCredsModal() {
+            document.getElementById('credsModal').style.display = 'none';
+        }
+
+        function validatePasswordRestrictions(password) {
+            const minLength = password.length >= 6;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+
+            return minLength && hasUpper && hasLower && hasNumber;
+        }
+
+        document.getElementById('credsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newUsername = document.getElementById('newUsername').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const errorElement = document.getElementById('credsError');
+
+            if (currentPassword !== authCredentials.password) {
+                errorElement.innerText = "ነባር የይለፍ ቃል የተሳሳተ ነው! (Current password is incorrect)";
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                errorElement.innerText = "አዲስ የይለፍ ቃሎች አይመሳሰሉም! (New passwords do not match)";
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            if (!validatePasswordRestrictions(newPassword)) {
+                errorElement.innerText = "የይለፍ ቃል መስፈርቱን አላሟላም! (Min 6 chars, uppercase, lowercase & digit required)";
+                errorElement.style.display = 'block';
+                return;
+            }
+
+            authCredentials.username = newUsername;
+            authCredentials.password = newPassword;
+            document.getElementById('displayUsername').innerText = authCredentials.username;
+
+            alert("የመግቢያ መረጃ በተሳካ ሁኔታ ተቀይሯል። (Credentials updated successfully!)");
+            closeCredsModal();
+        });
 
         /* Add Member Modal Logic */
         function openAddMemberModal() {
@@ -671,6 +904,7 @@
             const search = document.getElementById('searchInput').value.toLowerCase();
             const categoryFilter = document.getElementById('filterCategory').value;
             const genderFilter = document.getElementById('filterGender').value;
+            const selectedEthDate = getSelectedEthiopianDateString();
 
             tbody.innerHTML = '';
 
@@ -712,6 +946,7 @@
 
                 tr.innerHTML = `
                     <td>${m.id}</td>
+                    <td><span style="font-size:0.85rem; color:#475569; font-weight:600;">${selectedEthDate}</span></td>
                     <td><strong>${m.name}</strong></td>
                     <td><span class="badge ${genderBadge}">${m.gender}</span></td>
                     <td>${categoryTdContent}</td>
@@ -730,7 +965,7 @@
             updateStats();
         }
 
-        // Export CSV with Amharic Terms
+        // Export CSV with Ethiopian Date & Amharic Terms
         function exportCSV() {
             const statusAmharicMap = {
                 "Present": "ተገኝቷል/ታለች",
@@ -738,18 +973,20 @@
                 "Permitted": "ፍቃድ"
             };
 
+            const selectedEthDate = getSelectedEthiopianDateString();
+
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "ID,Full Name,Gender,Category,Role,Attendance Status\n";
+            csvContent += "ID,Ethiopian Date,Full Name,Gender,Category,Role,Attendance Status\n";
             
             membersData.forEach(m => {
                 const amharicStatus = statusAmharicMap[m.status] || m.status;
-                csvContent += `${m.id},"${m.name}","${m.gender}","${m.category}","${m.role || '-'}","${amharicStatus}"\n`;
+                csvContent += `${m.id},"${selectedEthDate}","${m.name}","${m.gender}","${m.category}","${m.role || '-'}","${amharicStatus}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Tsidu_Beteseb_Attendance_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `Tsidu_Beteseb_Attendance_${selectedEthDate.replace(/\s+/g, '_')}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
