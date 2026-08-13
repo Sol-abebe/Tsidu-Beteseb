@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="am">
 <head>
     <meta charset="UTF-8">
@@ -11,6 +11,8 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --male-color: #0284c7;
+            --female-color: #ec4899;
             --bg: #f8fafc;
             --card-bg: #ffffff;
             --text: #1e293b;
@@ -80,7 +82,7 @@
             outline: none;
         }
 
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             border-color: var(--primary-light);
         }
 
@@ -100,10 +102,18 @@
             background-color: var(--primary-light);
         }
 
+        .btn-secondary {
+            background-color: #64748b;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
         /* App Dashboard */
         .app-container {
             display: none;
-            max-width: 1100px;
+            max-width: 1250px;
             margin: 0 auto;
             padding: 1.5rem;
         }
@@ -117,43 +127,75 @@
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            flex-wrap: wrap;
         }
 
-        .btn-logout {
+        .user-info input {
+            padding: 0.4rem 0.6rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .btn-action {
             background: #e2e8f0;
             color: var(--text);
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.8rem;
             border-radius: 6px;
             border: none;
             cursor: pointer;
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
+        .btn-action:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-add-member {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-add-member:hover {
+            background-color: var(--primary);
+        }
+
+        /* Stats Section */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
         .stat-card {
             background: var(--card-bg);
-            padding: 1.2rem;
+            padding: 1rem;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             text-align: center;
         }
 
         .stat-card h3 {
-            font-size: 2rem;
+            font-size: 1.8rem;
             margin-top: 0.3rem;
             color: var(--primary);
+        }
+
+        .stat-card small {
+            font-size: 0.75rem;
+            color: #64748b;
+            display: block;
+            margin-top: 0.2rem;
         }
 
         .controls {
@@ -170,14 +212,14 @@
 
         .search-box {
             flex: 1;
-            min-width: 250px;
+            min-width: 220px;
         }
 
-        .search-box input {
-            width: 100%;
+        .search-box input, .filter-select {
             padding: 0.6rem;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
+            font-size: 0.9rem;
         }
 
         .table-container {
@@ -194,7 +236,7 @@
         }
 
         th, td {
-            padding: 0.9rem 1.2rem;
+            padding: 0.85rem 1.1rem;
             border-bottom: 1px solid #f1f5f9;
         }
 
@@ -205,7 +247,7 @@
             text-transform: uppercase;
         }
 
-        .status-badge {
+        .badge {
             display: inline-block;
             padding: 0.25rem 0.6rem;
             border-radius: 12px;
@@ -213,26 +255,43 @@
             font-weight: bold;
         }
 
-        .status-full { background: #dbeafe; color: #1e40af; }
-        .status-member { background: #e0e7ff; color: #3730a3; }
-        .status-supporter { background: #fef3c7; color: #92400e; }
+        .gender-male {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
 
-        .select-status {
+        .gender-female {
+            background: #fce7f3;
+            color: #be185d;
+        }
+
+        .select-status, .select-role, .select-category {
             padding: 0.4rem 0.6rem;
             border-radius: 6px;
             border: 1px solid #cbd5e1;
             font-weight: 600;
+            font-size: 0.85rem;
         }
 
-        .select-status.present { background-color: #d1fae5; color: #065f46; }
-        .select-status.absent { background-color: #fee2e2; color: #991b1b; }
-        .select-status.permitted { background-color: #fef3c7; color: #92400e; }
+        .select-status.present {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .select-status.absent {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .select-status.permitted {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
 
         .actions-bar {
             margin-top: 1.5rem;
             display: flex;
             justify-content: flex-end;
-            gap: 1rem;
         }
 
         .btn-export {
@@ -245,11 +304,38 @@
             cursor: pointer;
         }
 
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+        /* Modal Popup Styling */
+        .modal-overlay {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
@@ -262,17 +348,15 @@
             <p>Authorized Personnel Attendance Portal</p>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" placeholder="Enter username" required>
+                    <label for="username">ተጠቃሚ ስም (Username)</label>
+                    <input type="text" id="username" placeholder="Enter username" value="Admin" required>
                 </div>
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter password" required>
+                    <label for="password">የመግቢያ ቃል (Password)</label>
+                    <input type="password" id="password" placeholder="Enter password" value="1234">
                 </div>
-                <p class="error-msg" id="loginError">Invalid credentials. Try again.</p>
                 <button type="submit" class="btn">Log In</button>
             </form>
-            <p style="margin-top:1rem; font-size:0.75rem; color:#94a3b8;">Demo Login: admin / tsidu2026</p>
         </div>
     </div>
 
@@ -284,27 +368,43 @@
                 <small id="currentDateDisplay" style="color: #64748b;"></small>
             </div>
             <div class="user-info">
-                <span>Authorized User: <b id="loggedInUser">Admin</b></span>
-                <button class="btn-logout" onclick="logout()">Logout</button>
+                <span>ተጠቃሚ:</span>
+                <input type="text" id="loggedInUser" value="Admin" style="width: 120px;" title="Edit user name">
+                <button class="btn-action btn-add-member" onclick="openAddMemberModal()">+ Add New Member</button>
+                <button class="btn-action" onclick="logout()">Logout</button>
             </div>
         </header>
 
-        <!-- STATS -->
+        <!-- STATS WITH GENDER AND PERMISSION SUMMARY -->
         <div class="stats-grid">
             <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">Total Members</p>
+                <p style="color:#64748b; font-size:0.85rem;">ጠቅላላ አባላት</p>
                 <h3 id="statTotal">0</h3>
             </div>
             <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">Present (የተገኙ)</p>
+                <p style="color:#64748b; font-size:0.85rem;">የተገኙ</p>
                 <h3 id="statPresent" style="color: var(--success);">0</h3>
             </div>
             <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">Absent (የቀሩ)</p>
+                <p style="color:#64748b; font-size:0.85rem;">የቀሩ</p>
                 <h3 id="statAbsent" style="color: var(--danger);">0</h3>
             </div>
             <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">Attendance Rate</p>
+                <p style="color:var(--warning); font-size:0.85rem;">ፈቃድ</p>
+                <h3 id="statPermitted" style="color: var(--warning);">0</h3>
+            </div>
+            <div class="stat-card">
+                <p style="color:var(--female-color); font-size:0.85rem;">ሴት</p>
+                <h3 id="statFemale" style="color: var(--female-color);">0</h3>
+                <small id="statFemaleBreakdown">0 የተገኙ | 0 ፈቃድ</small>
+            </div>
+            <div class="stat-card">
+                <p style="color:var(--male-color); font-size:0.85rem;">ወንድ</p>
+                <h3 id="statMale" style="color: var(--male-color);">0</h3>
+                <small id="statMaleBreakdown">0 የተገኙ | 0 ፈቃድ</small>
+            </div>
+            <div class="stat-card">
+                <p style="color:#64748b; font-size:0.85rem;">የመገኘት መጠን</p>
                 <h3 id="statRate">0%</h3>
             </div>
         </div>
@@ -312,15 +412,22 @@
         <!-- CONTROLS -->
         <div class="controls">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search member by name..." oninput="renderTable()">
+                <input type="text" id="searchInput" placeholder="Search member name..." oninput="renderTable()">
             </div>
-            <div>
-                <label for="filterStatus" style="font-size:0.85rem; font-weight:600; margin-right: 0.5rem;">Filter Category:</label>
-                <select id="filterStatus" class="select-status" onchange="renderTable()" style="background:white; color:var(--text);">
-                    <option value="ALL">All Categories</option>
+            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+                <label style="font-size:0.85rem; font-weight:600;">ፆታ:</label>
+                <select id="filterGender" class="filter-select" onchange="renderTable()">
+                    <option value="ALL">ሁሉንም ፆታ</option>
+                    <option value="ሴት">ሴት</option>
+                    <option value="ወንድ">ወንድ</option>
+                </select>
+
+                <label style="font-size:0.85rem; font-weight:600; margin-left:0.5rem;">የአባልነት ሁኔታ:</label>
+                <select id="filterCategory" class="filter-select" onchange="renderTable()">
+                    <option value="ALL">ሁሉንም ዘርፍ</option>
                     <option value="ሙሉ አባል">ሙሉ አባል</option>
-                    <option value="አባል">አባል</option>
-                    <option value="ደጋፊ">ደጋፊ</option>
+                    <option value="እጩ አባል">እጩ አባል</option>
+                    <option value="ደጋፊ አባል">ደጋፊ አባል</option>
                 </select>
             </div>
         </div>
@@ -331,9 +438,11 @@
                 <thead>
                     <tr>
                         <th>ተ.ቁ</th>
-                        <th>ሙሉ ስም (Full Name)</th>
-                        <th>የአባልነት ሁኔታ (Category)</th>
-                        <th>የመገኘት ሁኔታ (Attendance)</th>
+                        <th>ሙሉ ስም</th>
+                        <th>ፆታ</th>
+                        <th>የአባልነት ሁኔታ</th>
+                        <th>የኃላፊነት ሚና</th>
+                        <th>የመገኘት ሁኔታ</th>
                     </tr>
                 </thead>
                 <tbody id="memberTableBody">
@@ -347,60 +456,103 @@
         </div>
     </div>
 
+    <!-- MODAL: ADD NEW MEMBER -->
+    <div class="modal-overlay" id="addMemberModal">
+        <div class="modal-card">
+            <h3>አዲስ አባል መመዝገቢያ</h3>
+            <form id="addMemberForm">
+                <div class="form-group">
+                    <label for="newTitle">ማዕረግ</label>
+                    <select id="newTitle">
+                        <option value="ወ/ሮ">ወ/ሮ</option>
+                        <option value="አቶ">አቶ</option>
+                        <option value="ወ/ሪት">ወ/ሪት</option>
+                        <option value="ዶ/ር">ዶ/ር</option>
+                        <option value="ሲ/ር">ሲ/ር</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newName">ሙሉ ስም</label>
+                    <input type="text" id="newName" placeholder="e.g. አበበ ከበደ" required>
+                </div>
+                <div class="form-group">
+                    <label for="newGender">ፆታ</label>
+                    <select id="newGender" required>
+                        <option value="ሴት">ሴት</option>
+                        <option value="ወንድ">ወንድ</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newCategory">የአባልነት ሁኔታ</label>
+                    <select id="newCategory" onchange="handleNewCategoryChange(this.value)" required>
+                        <option value="ሙሉ አባል">ሙሉ አባል</option>
+                        <option value="እጩ አባል">እጩ አባል</option>
+                        <option value="ደጋፊ አባል">ደጋፊ አባል</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newRole">የኃላፊነት ሚና</label>
+                    <select id="newRole">
+                        <option value="አመራር">አመራር</option>
+                        <option value="ተተኪ አመራር">ተተኪ አመራር</option>
+                        <option value="ግንባር ቀደም አባል">ግንባር ቀደም አባል</option>
+                        <option value="አባል" selected>አባል</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn">Add Member</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeAddMemberModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Initial Dataset extracted from uploaded file
+        // Dataset using Amharic gender terms (ሴት / ወንድ) and categories (ሙሉ አባል, እጩ አባል, ደጋፊ አባል)
         const membersData = [
-            { id: 1, name: "ወ/ሮ ሊድያ መሀመድ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 2, name: "ወ/ሮ ሲሳይ ተፈራ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 3, name: "ወ/ሮ ቤተልሄም ኪሮስ ለማ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 4, name: "አቶ ተስፋሁን ፍስሃ ሞሃ", category: "ሙሉ አባል", status: "Present" },
-            { id: 5, name: "ወ/ሮ ትግስት አበራ መንበረ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 6, name: "ወ/ሮ ትግስት ግዛው አምደመስቀል", category: "ሙሉ አባል", status: "Absent" },
-            { id: 7, name: "ወ/ሮ አይናለም ይርጋ ላቀው", category: "ሙሉ አባል", status: "Absent" },
-            { id: 8, name: "ወ/ሮ እመቤት ከበደ ይፍሩ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 9, name: "አቶ ያሬድ ሽፈራው ሳህሌ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 10, name: "ወ/ሮ ኮከቤ ታደሰ ተሰማ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 11, name: "ወ/ሮ ዘውዴ በላይ ጓንጉል", category: "ሙሉ አባል", status: "Absent" },
-            { id: 12, name: "ወ/ሮ የሺህሃረግ ወ/አረጋይ ተሰማ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 13, name: "አቶ ይስሃቅ ሽመልሽ አሰፋ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 14, name: "ወ/ሮ ግንዛቤ አሰፋ ላቀው", category: "ሙሉ አባል", status: "Absent" },
-            { id: 15, name: "ወ/ሪት ፂዎን በየነ ተስፋዬ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 16, name: "ዶ/ር ፍቃዱ አዱኛ ቀነዓ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 17, name: "ሲ/ር ሲንቦኔ ካባ ረጋሳ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 18, name: "አቶ ሰሎሞን ተማረ ብርሃኑ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 19, name: "ዶ/ር ሀብታሙ መኮንን ከሰሳ", category: "ሙሉ አባል", status: "Absent" },
-            { id: 20, name: "አቶ ዳዊት ደስታ ተሻለ", category: "ደጋፊ", status: "Absent" },
-            { id: 21, name: "አቶ ተካልኝ ገነቲ ያዴሳ", category: "አባል", status: "Absent" },
-            { id: 22, name: "ወ/ሮ ለምለም በየነ ቦጋለ", category: "አባል", status: "Absent" },
-            { id: 23, name: "ወ/ሮ ጤና ደመቀ", category: "ደጋፊ", status: "Absent" },
-            { id: 24, name: "ዶ/ር ሰለሞን አበበ ከበደ", category: "አባል", status: "Absent" },
-            { id: 25, name: "አቶ ግርማው ወንድምአለም ተስፋዬ", category: "አባል", status: "Absent" },
-            { id: 26, name: "ሲ/ር እታገኝ አዲሱ ገላው", category: "አባል", status: "Absent" },
-            { id: 27, name: "ወ/ሪት እመቤት አጥላው አበበ", category: "አባል", status: "Absent" }
+            { id: 1, name: "ወ/ሮ ሊድያ መሀመድ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 2, name: "ወ/ሮ ሲሳይ ተፈራ", gender: "ሴት", category: "ሙሉ አባል", role: "አመራር", status: "Absent" },
+            { id: 3, name: "ወ/ሮ ቤተልሄም ኪሮስ ለማ", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
+            { id: 4, name: "አቶ ተስፋሁን ፍስሃ ሞሃ", gender: "ወንድ", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
+            { id: 5, name: "ወ/ሮ ትግስት አበራ መንበረ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 6, name: "ወ/ሮ ትግስት ግዛው አምደመስቀል", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
+            { id: 7, name: "ወ/ሮ አይናለም ይርጋ ላቀው", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Present" },
+            { id: 8, name: "ወ/ሮ እመቤት ከበደ ይፍሩ", gender: "ሴት", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
+            { id: 9, name: "አቶ ያሬድ ሽፈራው ሳህሌ", gender: "ወንድ", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 10, name: "ወ/ሮ ኮከቤ ታደሰ ተሰማ", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Present" },
+            { id: 11, name: "ወ/ሮ ዘውዴ በላይ ጓንጉል", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 12, name: "ወ/ሮ የሺህሃረግ ወ/አረጋይ ተሰማ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 13, name: "አቶ ይስሃቅ ሽመልሽ አሰፋ", gender: "ወንድ", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
+            { id: 14, name: "ወ/ሮ ግንዛቤ አሰፋ ላቀው", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 15, name: "ወ/ሪት ፂዎን በየነ ተስፋዬ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 16, name: "ዶ/ር ፍቃዱ አዱኛ ቀነዓ", gender: "ወንድ", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
+            { id: 17, name: "ሲ/ር ሲንቦኔ ካባ ረጋሳ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 18, name: "አቶ ሰሎሞን ተማረ ብርሃኑ", gender: "ወንድ", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Present" },
+            { id: 19, name: "ዶ/ር ሀብታሙ መኮንን ከሰሳ", gender: "ወንድ", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
+            { id: 20, name: "አቶ ዳዊት ደስታ ተሻለ", gender: "ወንድ", category: "ደጋፊ አባል", role: "-", status: "Present" },
+            { id: 21, name: "አቶ ተካልኝ ገነቲ ያዴሳ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Absent" },
+            { id: 22, name: "ወ/ሮ ለምለም በየነ ቦጋለ", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Absent" },
+            { id: 23, name: "ወ/ሮ ጤና ደመቀ", gender: "ሴት", category: "ደጋፊ አባል", role: "-", status: "Absent" },
+            { id: 24, name: "ዶ/ር ሰለሞን አበበ ከበደ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Present" },
+            { id: 25, name: "አቶ ግርማው ወንድምአለም ተስፋዬ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Absent" },
+            { id: 26, name: "ሲ/ር እታገኝ አዲሱ ገላው", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Present" },
+            { id: 27, name: "ወ/ሪት እመቤት አጥላው አበበ", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Absent" }
         ];
 
-        // Login Handler
+        // Direct Login Handler
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-
-            // Simple demo credentials
-            if(user === 'admin' && pass === 'tsidu2026') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appScreen').style.display = 'block';
-                document.getElementById('loggedInUser').innerText = user;
-                initApp();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-            }
+            const userVal = document.getElementById('username').value.trim() || 'Admin';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'block';
+            document.getElementById('loggedInUser').value = userVal;
+            initApp();
         });
 
         function logout() {
             document.getElementById('appScreen').style.display = 'none';
             document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
         }
 
         function initApp() {
@@ -408,6 +560,52 @@
             document.getElementById('currentDateDisplay').innerText = `Date: ${today}`;
             renderTable();
         }
+
+        /* Add Member Modal Logic */
+        function openAddMemberModal() {
+            document.getElementById('addMemberModal').style.display = 'flex';
+            handleNewCategoryChange(document.getElementById('newCategory').value);
+        }
+
+        function closeAddMemberModal() {
+            document.getElementById('addMemberModal').style.display = 'none';
+            document.getElementById('addMemberForm').reset();
+        }
+
+        function handleNewCategoryChange(category) {
+            const roleSelect = document.getElementById('newRole');
+            if (category === 'ሙሉ አባል') {
+                roleSelect.disabled = false;
+            } else {
+                roleSelect.disabled = true;
+                roleSelect.value = '-';
+            }
+        }
+
+        document.getElementById('addMemberForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('newTitle').value;
+            const rawName = document.getElementById('newName').value.trim();
+            const gender = document.getElementById('newGender').value;
+            const category = document.getElementById('newCategory').value;
+            const role = category === 'ሙሉ አባል' ? document.getElementById('newRole').value : '-';
+
+            const fullName = `${title} ${rawName}`;
+            const newId = membersData.length + 1;
+
+            membersData.push({
+                id: newId,
+                name: fullName,
+                gender: gender,
+                category: category,
+                role: role,
+                status: "Absent"
+            });
+
+            alert(`Member "${fullName}" registered successfully!`);
+            closeAddMemberModal();
+            renderTable();
+        });
 
         function updateAttendance(id, newStatus) {
             const member = membersData.find(m => m.id === id);
@@ -417,47 +615,112 @@
             }
         }
 
+        function updateCategory(id, newCategory) {
+            const member = membersData.find(m => m.id === id);
+            if (member) {
+                member.category = newCategory;
+                if (newCategory === 'ሙሉ አባል') {
+                    if (!member.role || member.role === '-') {
+                        member.role = 'አባል';
+                    }
+                } else {
+                    member.role = '-';
+                }
+                renderTable();
+            }
+        }
+
+        function updateRole(id, newRole) {
+            const member = membersData.find(m => m.id === id);
+            if (member) {
+                member.role = newRole;
+            }
+        }
+
         function updateStats() {
             const total = membersData.length;
             const present = membersData.filter(m => m.status === 'Present').length;
             const absent = membersData.filter(m => m.status === 'Absent').length;
+            const permitted = membersData.filter(m => m.status === 'Permitted').length;
             const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+
+            const females = membersData.filter(m => m.gender === 'ሴት');
+            const males = membersData.filter(m => m.gender === 'ወንድ');
+
+            const femalePresent = females.filter(m => m.status === 'Present').length;
+            const femalePermitted = females.filter(m => m.status === 'Permitted').length;
+
+            const malePresent = males.filter(m => m.status === 'Present').length;
+            const malePermitted = males.filter(m => m.status === 'Permitted').length;
 
             document.getElementById('statTotal').innerText = total;
             document.getElementById('statPresent').innerText = present;
             document.getElementById('statAbsent').innerText = absent;
+            document.getElementById('statPermitted').innerText = permitted;
             document.getElementById('statRate').innerText = `${rate}%`;
+
+            document.getElementById('statFemale').innerText = females.length;
+            document.getElementById('statFemaleBreakdown').innerText = `${femalePresent} የተገኙ | ${femalePermitted} ፈቃድ`;
+
+            document.getElementById('statMale').innerText = males.length;
+            document.getElementById('statMaleBreakdown').innerText = `${malePresent} የተገኙ | ${malePermitted} ፈቃድ`;
         }
 
         function renderTable() {
             const tbody = document.getElementById('memberTableBody');
             const search = document.getElementById('searchInput').value.toLowerCase();
-            const filter = document.getElementById('filterStatus').value;
+            const categoryFilter = document.getElementById('filterCategory').value;
+            const genderFilter = document.getElementById('filterGender').value;
 
             tbody.innerHTML = '';
 
             const filtered = membersData.filter(m => {
                 const matchesSearch = m.name.toLowerCase().includes(search);
-                const matchesFilter = filter === 'ALL' || m.category === filter;
-                return matchesSearch && matchesFilter;
+                const matchesCategory = categoryFilter === 'ALL' || m.category === categoryFilter;
+                const matchesGender = genderFilter === 'ALL' || m.gender === genderFilter;
+                return matchesSearch && matchesCategory && matchesGender;
             });
 
             filtered.forEach(m => {
                 const tr = document.createElement('tr');
                 
-                let badgeClass = 'status-member';
-                if (m.category === 'ሙሉ አባል') badgeClass = 'status-full';
-                if (m.category === 'ደጋፊ') badgeClass = 'status-supporter';
+                const genderBadge = m.gender === 'ሴት' ? 'gender-female' : 'gender-male';
+
+                // Editable Category Dropdown
+                let categoryTdContent = `
+                    <select class="select-category" onchange="updateCategory(${m.id}, this.value)">
+                        <option value="ሙሉ አባል" ${m.category === 'ሙሉ አባል' ? 'selected' : ''}>ሙሉ አባል</option>
+                        <option value="እጩ አባል" ${m.category === 'እጩ አባል' ? 'selected' : ''}>እጩ አባል</option>
+                        <option value="ደጋፊ አባል" ${m.category === 'ደጋፊ አባል' ? 'selected' : ''}>ደጋፊ አባል</option>
+                    </select>
+                `;
+
+                // Editable Role Dropdown
+                let roleTdContent = '';
+                if (m.category === 'ሙሉ አባል') {
+                    roleTdContent = `
+                        <select class="select-role" onchange="updateRole(${m.id}, this.value)">
+                            <option value="አመራር" ${m.role === 'አመራር' ? 'selected' : ''}>አመራር</option>
+                            <option value="ተተኪ አመራር" ${m.role === 'ተተኪ አመራር' ? 'selected' : ''}>ተተኪ አመራር</option>
+                            <option value="ግንባር ቀደም አባል" ${m.role === 'ግንባር ቀደም አባል' ? 'selected' : ''}>ግንባር ቀደም አባል</option>
+                            <option value="አባል" ${m.role === 'አባል' || !m.role ? 'selected' : ''}>አባል</option>
+                        </select>
+                    `;
+                } else {
+                    roleTdContent = `<span style="color:#94a3b8; font-size:0.85rem;">-</span>`;
+                }
 
                 tr.innerHTML = `
                     <td>${m.id}</td>
                     <td><strong>${m.name}</strong></td>
-                    <td><span class="status-badge ${badgeClass}">${m.category}</span></td>
+                    <td><span class="badge ${genderBadge}">${m.gender}</span></td>
+                    <td>${categoryTdContent}</td>
+                    <td>${roleTdContent}</td>
                     <td>
                         <select class="select-status ${m.status.toLowerCase()}" onchange="updateAttendance(${m.id}, this.value); this.className = 'select-status ' + this.value.toLowerCase();">
-                            <option value="Present" ${m.status === 'Present' ? 'selected' : ''}>Present (አለ/ች)</option>
-                            <option value="Absent" ${m.status === 'Absent' ? 'selected' : ''}>Absent (የቀረ/ች)</option>
-                            <option value="Permitted" ${m.status === 'Permitted' ? 'selected' : ''}>Permitted (ፈቃድ)</option>
+                            <option value="Present" ${m.status === 'Present' ? 'selected' : ''}>Present (ተገኝቷል/ታለች)</option>
+                            <option value="Absent" ${m.status === 'Absent' ? 'selected' : ''}>Absent (ቀሪ)</option>
+                            <option value="Permitted" ${m.status === 'Permitted' ? 'selected' : ''}>Permitted (ፍቃድ)</option>
                         </select>
                     </td>
                 `;
@@ -467,12 +730,20 @@
             updateStats();
         }
 
+        // Export CSV with Amharic Terms
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "ID,Full Name,Category,Attendance Status\n";
+            const statusAmharicMap = {
+                "Present": "ተገኝቷል/ታለች",
+                "Absent": "ቀሪ",
+                "Permitted": "ፍቃድ"
+            };
 
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "ID,Full Name,Gender,Category,Role,Attendance Status\n";
+            
             membersData.forEach(m => {
-                csvContent += `${m.id},"${m.name}","${m.category}","${m.status}"\n`;
+                const amharicStatus = statusAmharicMap[m.status] || m.status;
+                csvContent += `${m.id},"${m.name}","${m.gender}","${m.category}","${m.role || '-'}","${amharicStatus}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
