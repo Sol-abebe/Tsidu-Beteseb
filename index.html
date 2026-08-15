@@ -178,7 +178,10 @@
             outline: none;
         }
 
-        /* Search Section */
+        /* Search & Title Section */
+        .title-entry-container {
+            margin-bottom: 15px;
+        }
         .table-header-tools {
             display: flex;
             justify-content: space-between;
@@ -496,8 +499,21 @@
 
         <hr>
 
+        <!-- ADDED: Title Entry Field above the Table -->
+        <div class="form-group title-entry-container">
+            <label for="documentTitleInput">የሰነድ / የሠንጠረዥ ርዕስ (Document Title)</label>
+            <input 
+                type="text" 
+                id="documentTitleInput" 
+                class="text-input" 
+                value="የተመዘገቡ አባላት ዝርዝር" 
+                placeholder="የሠንጠረዡን ርዕስ ያስገቡ..." 
+                oninput="updateDisplayTitle()"
+            >
+        </div>
+
         <div class="table-header-tools">
-            <h3>የተመዘገቡ አባላት ዝርዝር</h3>
+            <h3 id="tableDynamicTitle">የተመዘገቡ አባላት ዝርዝር</h3>
             <!-- Search Input Feature -->
             <input type="text" id="searchInput" class="search-box" placeholder="በስም፣ በማዕረግ ወይም በሁኔታ ፈልግ..." onkeyup="renderTable()">
         </div>
@@ -534,6 +550,11 @@
         var currentUser = null;
         var listData = [];
         var monthsList = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
+
+        function updateDisplayTitle() {
+            var val = document.getElementById('documentTitleInput').value.trim();
+            document.getElementById('tableDynamicTitle').textContent = val !== "" ? val : "የተመዘገቡ አባላት ዝርዝር";
+        }
 
         function handleLogin() {
             var u = document.getElementById('usernameInput').value.trim();
@@ -821,7 +842,8 @@
                 return;
             }
 
-            var csvText = "\uFEFFተ.ቁ,ማዕረግ,ሙሉ ስም,ጾታ,የአባልነት ሁኔታ,የኃላፊነት ሚና,ቀን,የመገኘት ሁኔታ,ፊርማ\n";
+            var docTitle = document.getElementById('documentTitleInput').value.trim() || "የተመዘገቡ አባላት ዝርዝር";
+            var csvText = "\uFEFF" + docTitle + "\n\nተ.ቁ,ማዕረግ,ሙሉ ስም,ጾታ,የአባልነት ሁኔታ,የኃላፊነት ሚና,ቀን,የመገኘት ሁኔታ,ፊርማ\n";
             for (var i = 0; i < listData.length; i++) {
                 var o = listData[i];
                 csvText += (i + 1) + ',"' + o.title + '","' + o.fullName + '","' + o.gender + '","' + o.membershipStatus + '","' + o.role + '","' + o.dateStr + '","' + o.attendance + '",""\n';
@@ -830,7 +852,7 @@
             var blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
             var link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Tsidu_Beteseb_Attendance.csv";
+            link.download = docTitle.replace(/[^a-zA-Z0-9ሀ-ፐ0-9_]/g, "_") + ".csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
