@@ -17,17 +17,70 @@
             color: #333;
         }
         .main-card {
-            max-width: 950px;
+            max-width: 980px;
             margin: 0 auto;
             background: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
+        
+        /* Auth Bar */
+        .auth-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .user-info {
+            font-size: 0.9rem;
+        }
+        .user-role-badge {
+            background-color: #1b4d3e;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
+        .auth-btns {
+            display: flex;
+            gap: 8px;
+        }
+
         h2, h3 {
             text-align: center;
             color: #1b4d3e;
             margin-bottom: 20px;
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .login-box {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 330px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .login-box h4 {
+            margin-bottom: 15px;
+            color: #1b4d3e;
+            text-align: center;
         }
 
         /* Stats Bar & Grid */
@@ -125,6 +178,23 @@
             outline: none;
         }
 
+        /* Search Section */
+        .table-header-tools {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .search-box {
+            width: 280px;
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+        }
+
         /* Chip Options Layout */
         .radio-options {
             display: flex;
@@ -179,8 +249,8 @@
             margin-top: 10px;
         }
         .btn {
-            padding: 12px 22px;
-            font-size: 1rem;
+            padding: 10px 18px;
+            font-size: 0.9rem;
             font-weight: bold;
             color: #ffffff;
             border: none;
@@ -189,8 +259,17 @@
         }
         .btn-submit { background-color: #1b4d3e; }
         .btn-export { background-color: #27ae60; }
+        .btn-login { background-color: #2980b9; width: 100%; margin-top: 10px; }
+        .btn-change-pwd { background-color: #f39c12; padding: 5px 12px; font-size: 0.8rem; }
+        .btn-logout { background-color: #e74c3c; padding: 5px 12px; font-size: 0.8rem; }
         .btn-edit { background-color: #f39c12; padding: 5px 10px; font-size: 0.85rem; }
         .btn-delete { background-color: #c0392b; padding: 5px 10px; font-size: 0.85rem; }
+        .btn-cancel { background-color: #7f8c8d; width: 100%; margin-top: 5px; }
+
+        .disabled-form {
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
         hr {
             margin: 25px 0;
@@ -205,7 +284,7 @@
         .data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 15px;
+            margin-top: 10px;
         }
         .data-table th, .data-table td {
             padding: 10px;
@@ -222,7 +301,59 @@
 </head>
 <body>
 
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-box">
+            <h4>ስርዓቱ ውስጥ ይግቡ</h4>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>የተጠቃሚ ስም</label>
+                <input type="text" id="usernameInput" class="text-input" placeholder="admin ወይም user">
+            </div>
+            <div class="form-group">
+                <label>የይለፍ ቃል</label>
+                <input type="password" id="passwordInput" class="text-input" value="1234">
+            </div>
+            <button class="btn btn-login" onclick="handleLogin()">ይግቡ</button>
+            <p style="font-size: 0.75rem; color: #7f8c8d; margin-top: 10px; text-align: center;">
+                ተሞካሪዎች: <b>admin</b> / 1234 ወይም <b>user</b> / 1234
+            </p>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div class="modal-overlay" id="pwdModal" style="display: none;">
+        <div class="login-box">
+            <h4>የይለፍ ቃል ቀይር</h4>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>የአሁኑ የይለፍ ቃል</label>
+                <input type="password" id="oldPwdInput" class="text-input" placeholder="የአሁኑን የይለፍ ቃል ያስገቡ">
+            </div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>አዲስ የይለፍ ቃል</label>
+                <input type="password" id="newPwdInput" class="text-input" placeholder="አዲስ የይለፍ ቃል">
+            </div>
+            <div class="form-group">
+                <label>አዲሱን የይለፍ ቃል ያረጋግጡ</label>
+                <input type="password" id="confirmPwdInput" class="text-input" placeholder="አዲሱን የይለፍ ቃል ድጋሚ ያስገቡ">
+            </div>
+            <button class="btn btn-login" onclick="handleChangePassword()">ቀይር</button>
+            <button class="btn btn-cancel" onclick="closePwdModal()">ሰርዝ (Cancel)</button>
+        </div>
+    </div>
+
     <div class="main-card">
+        <!-- Auth Info Bar -->
+        <div class="auth-header">
+            <div class="user-info">
+                ተጠቃሚ: <span id="lblUser">አልገቡም</span>
+                <span class="user-role-badge" id="lblRole">-</span>
+            </div>
+            <div class="auth-btns">
+                <button class="btn btn-change-pwd" id="btnChangePwd" onclick="openPwdModal()" style="display: none;">ይለፍ ቃል ቀይር</button>
+                <button class="btn btn-logout" id="btnLogout" onclick="handleLogout()" style="display: none;">ውጣ (Logout)</button>
+            </div>
+        </div>
+
         <h2>የፅዱ ቤተሰብ ወርሃዊ የክትትል መመዝገቢያ</h2>
 
         <!-- Enhanced Dashboard Summary -->
@@ -271,7 +402,7 @@
             </div>
         </div>
 
-        <form id="attendanceForm">
+        <form id="attendanceForm" class="disabled-form">
             <input type="hidden" id="editIndex" value="-1">
 
             <div class="form-grid">
@@ -365,7 +496,12 @@
 
         <hr>
 
-        <h3>የተመዘገቡ አባላት ዝርዝር</h3>
+        <div class="table-header-tools">
+            <h3>የተመዘገቡ አባላት ዝርዝር</h3>
+            <!-- Search Input Feature -->
+            <input type="text" id="searchInput" class="search-box" placeholder="በስም፣ በማዕረግ ወይም በሁኔታ ፈልግ..." onkeyup="renderTable()">
+        </div>
+
         <div class="table-container">
             <table class="data-table">
                 <thead>
@@ -389,10 +525,95 @@
     </div>
 
     <script>
+        // Users credentials object (Default values)
+        var userCredentials = {
+            "admin": { password: "1234", name: "Admin User", role: "Admin" },
+            "user": { password: "1234", name: "Standard User", role: "User" }
+        };
+
+        var currentUser = null;
         var listData = [];
         var monthsList = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
 
-        // Init Month Buttons
+        function handleLogin() {
+            var u = document.getElementById('usernameInput').value.trim();
+            var p = document.getElementById('passwordInput').value.trim();
+
+            if (userCredentials[u] && userCredentials[u].password === p) {
+                currentUser = {
+                    username: u,
+                    name: userCredentials[u].name,
+                    role: userCredentials[u].role
+                };
+            } else {
+                alert("የተሳሳተ የተጠቃሚ ስም ወይም የይለፍ ቃል!");
+                return;
+            }
+
+            document.getElementById('loginModal').style.display = "none";
+            document.getElementById('btnLogout').style.display = "inline-block";
+            document.getElementById('btnChangePwd').style.display = "inline-block";
+            document.getElementById('lblUser').textContent = currentUser.name;
+            document.getElementById('lblRole').textContent = currentUser.role;
+
+            if (currentUser.role === "Admin") {
+                document.getElementById('attendanceForm').classList.remove('disabled-form');
+            } else {
+                document.getElementById('attendanceForm').classList.add('disabled-form');
+            }
+
+            renderTable();
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            document.getElementById('loginModal').style.display = "flex";
+            document.getElementById('btnLogout').style.display = "none";
+            document.getElementById('btnChangePwd').style.display = "none";
+            document.getElementById('lblUser').textContent = "አልገቡም";
+            document.getElementById('lblRole').textContent = "-";
+            document.getElementById('attendanceForm').classList.add('disabled-form');
+            renderTable();
+        }
+
+        function openPwdModal() {
+            document.getElementById('oldPwdInput').value = "";
+            document.getElementById('newPwdInput').value = "";
+            document.getElementById('confirmPwdInput').value = "";
+            document.getElementById('pwdModal').style.display = "flex";
+        }
+
+        function closePwdModal() {
+            document.getElementById('pwdModal').style.display = "none";
+        }
+
+        function handleChangePassword() {
+            if (!currentUser) return;
+
+            var oldPwd = document.getElementById('oldPwdInput').value;
+            var newPwd = document.getElementById('newPwdInput').value;
+            var confirmPwd = document.getElementById('confirmPwdInput').value;
+
+            if (userCredentials[currentUser.username].password !== oldPwd) {
+                alert("የነበረው የይለፍ ቃል የተሳሳተ ነው!");
+                return;
+            }
+
+            if (newPwd.trim() === "") {
+                alert("እባክዎን አዲስ የይለፍ ቃል ያስገቡ!");
+                return;
+            }
+
+            if (newPwd !== confirmPwd) {
+                alert("አዲሱ የይለፍ ቃል ከተረጋገጠው ጋር አይመሳሰልም!");
+                return;
+            }
+
+            userCredentials[currentUser.username].password = newPwd;
+            alert("የይለፍ ቃልዎ በተሳካ ሁኔታ ተቀይሯል!");
+            closePwdModal();
+        }
+
         function buildMonthChips() {
             var container = document.getElementById('monthContainer');
             container.innerHTML = "";
@@ -407,7 +628,6 @@
             }
         }
 
-        // Init Day Buttons based on selected month
         function buildDayChips(maxDays) {
             var container = document.getElementById('dayContainer');
             var selectedDay = getRadioValue('ethDay');
@@ -475,7 +695,6 @@
                 if (isMale) totalM++;
                 if (isFemale) totalF++;
 
-                // Attendance Status
                 if (d.attendance === "ተገኝቷል") {
                     if (isMale) presM++;
                     if (isFemale) presF++;
@@ -487,7 +706,6 @@
                     if (isFemale) permF++;
                 }
 
-                // Membership Status
                 if (d.membershipStatus === "ሙሉ አባል") {
                     if (isMale) fullM++;
                     if (isFemale) fullF++;
@@ -500,7 +718,6 @@
                 }
             }
 
-            // Attendance Totals
             document.getElementById('txtTotal').textContent = total;
             document.getElementById('txtTotalGender').textContent = "(ወ: " + totalM + " | ሴ: " + totalF + ")";
 
@@ -513,7 +730,6 @@
             document.getElementById('txtPermission').textContent = (permM + permF);
             document.getElementById('txtPermissionGender').textContent = "(ወ: " + permM + " | ሴ: " + permF + ")";
 
-            // Membership Aggregation
             document.getElementById('txtFullMember').textContent = (fullM + fullF);
             document.getElementById('txtFullMemberGender').textContent = "ወ: " + fullM + " | ሴ: " + fullF;
 
@@ -528,13 +744,28 @@
             var tbody = document.getElementById('recordTableBody');
             tbody.innerHTML = "";
 
+            var searchKey = document.getElementById('searchInput').value.toLowerCase().trim();
+
             for (var i = 0; i < listData.length; i++) {
                 var item = listData[i];
+
+                if (searchKey !== "") {
+                    var fullStr = (item.fullName + " " + item.title + " " + item.gender + " " + item.membershipStatus + " " + item.role + " " + item.attendance).toLowerCase();
+                    if (fullStr.indexOf(searchKey) === -1) {
+                        continue;
+                    }
+                }
+
                 var cssClass = "";
-                
                 if (item.attendance === "ተገኝቷል") cssClass = "txt-present";
                 else if (item.attendance === "ቀሪ") cssClass = "txt-absent";
                 else if (item.attendance === "ፈቃድ") cssClass = "txt-permission";
+
+                var actionBtns = "-";
+                if (currentUser && currentUser.role === "Admin") {
+                    actionBtns = '<button class="btn btn-edit" onclick="editRow(' + i + ')">አርም</button> ' +
+                                 '<button class="btn btn-delete" onclick="deleteRow(' + i + ')">ሰርዝ</button>';
+                }
 
                 var tr = document.createElement('tr');
                 tr.innerHTML = 
@@ -547,10 +778,7 @@
                     '<td>' + item.dateStr + '</td>' +
                     '<td class="' + cssClass + '">' + item.attendance + '</td>' +
                     '<td class="signature-col">_________________</td>' +
-                    '<td>' +
-                        '<button class="btn btn-edit" onclick="editRow(' + i + ')">አርም</button> ' +
-                        '<button class="btn btn-delete" onclick="deleteRow(' + i + ')">ሰርዝ</button>' +
-                    '</td>';
+                    '<td>' + actionBtns + '</td>';
                 tbody.appendChild(tr);
             }
 
@@ -558,6 +786,8 @@
         }
 
         function editRow(index) {
+            if (!currentUser || currentUser.role !== "Admin") return;
+            
             var d = listData[index];
             document.getElementById('fullName').value = d.fullName;
             setRadioValue('title', d.title);
@@ -577,6 +807,8 @@
         }
 
         function deleteRow(index) {
+            if (!currentUser || currentUser.role !== "Admin") return;
+
             if (confirm("እርግጠኛ ነዎት ይህ መረጃ ይደለዝ?")) {
                 listData.splice(index, 1);
                 renderTable();
@@ -606,6 +838,7 @@
 
         document.getElementById('attendanceForm').onsubmit = function(e) {
             e.preventDefault();
+            if (!currentUser || currentUser.role !== "Admin") return;
 
             var idx = parseInt(document.getElementById('editIndex').value);
             
