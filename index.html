@@ -3,1022 +3,644 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tsidu Beteseb Attendance System</title>
+    <title>የፅዱ ቤተሰብ ወርሃዊ የክትትል መመዝገቢያ</title>
     <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-light: #3b82f6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --male-color: #0284c7;
-            --female-color: #ec4899;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-        }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
         body {
-            background-color: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            padding: 15px;
+            color: #333;
+        }
+        .main-card {
+            max-width: 950px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        h2, h3 {
+            text-align: center;
+            color: #1b4d3e;
+            margin-bottom: 20px;
         }
 
-        /* Login Screen */
-        .login-container {
+        /* Stats Bar & Grid */
+        .dashboard-section {
+            background-color: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .dashboard-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #1b4d3e;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #1b4d3e;
+            padding-bottom: 5px;
+        }
+        .stats-container {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            flex-wrap: wrap;
+            gap: 10px;
         }
-
-        .login-card {
-            background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 400px;
+        .stat-box {
+            flex: 1;
+            min-width: 130px;
+            padding: 10px;
+            border-radius: 6px;
+            color: #fff;
             text-align: center;
         }
+        .bg-total { background-color: #2c3e50; }
+        .bg-present { background-color: #27ae60; }
+        .bg-absent { background-color: #c0392b; }
+        .bg-permission { background-color: #d35400; }
 
-        .login-card h2 {
-            margin-bottom: 0.5rem;
-            color: var(--primary);
+        .stat-box h5 { margin-bottom: 4px; font-size: 0.85rem; }
+        .stat-box p.num { font-size: 1.2rem; font-weight: bold; }
+        .stat-box p.sub { font-size: 0.75rem; opacity: 0.9; margin-top: 2px; }
+
+        .member-stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
         }
-
-        .login-card p {
-            color: #64748b;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.2rem;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.75rem;
+        .member-stat-card {
+            flex: 1;
+            min-width: 180px;
+            background: #fff;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+        .member-stat-card h6 {
+            color: #2c3e50;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+        }
+        .member-stat-card .val {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #1b4d3e;
+        }
+        .member-stat-card .sub-val {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        /* Form Layout */
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-group label {
+            font-weight: bold;
             font-size: 0.95rem;
+            color: #2c3e50;
+        }
+        
+        .text-input {
+            width: 100%;
+            height: 42px;
+            padding: 8px 12px;
+            font-size: 1rem;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
             outline: none;
         }
 
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary-light);
+        /* Chip Options Layout */
+        .radio-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
         }
-
-        .password-hint {
-            font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 0.3rem;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 0.75rem;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-light);
-        }
-
-        .btn-secondary {
-            background-color: #64748b;
-        }
-
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-
-        /* App Dashboard */
-        .app-container {
+        .radio-options input[type="radio"] {
             display: none;
-            max-width: 1250px;
-            margin: 0 auto;
-            padding: 1.5rem;
         }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .header-date-box {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.4rem;
-            flex-wrap: wrap;
-        }
-
-        .header-date-box select {
-            padding: 0.35rem 0.6rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .user-badge {
-            background: #e2e8f0;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--primary);
-        }
-
-        .btn-action {
-            background: #e2e8f0;
-            color: var(--text);
-            padding: 0.5rem 0.8rem;
-            border-radius: 6px;
-            border: none;
+        .radio-options label {
+            padding: 7px 12px;
+            font-size: 0.88rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 18px;
+            background-color: #f8f9fa;
+            color: #333;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.85rem;
+            user-select: none;
+            transition: all 0.2s ease;
+            font-weight: normal;
         }
-
-        .btn-action:hover {
-            background: #cbd5e1;
-        }
-
-        .btn-add-member {
-            background-color: var(--primary-light);
-            color: white;
-        }
-
-        .btn-add-member:hover {
-            background-color: var(--primary);
-        }
-
-        /* Stats Section */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--card-bg);
-            padding: 1rem;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .stat-card h3 {
-            font-size: 1.8rem;
-            margin-top: 0.3rem;
-            color: var(--primary);
-        }
-
-        .stat-card small {
-            font-size: 0.75rem;
-            color: #64748b;
-            display: block;
-            margin-top: 0.2rem;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--card-bg);
-            padding: 1rem;
-            border-radius: 10px;
-        }
-
-        .search-box {
-            flex: 1;
-            min-width: 220px;
-        }
-
-        .search-box input, .filter-select {
-            padding: 0.6rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-
-        .table-container {
-            background: var(--card-bg);
-            border-radius: 10px;
-            overflow-x: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th, td {
-            padding: 0.85rem 1.1rem;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: #64748b;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
+        .radio-options input[type="radio"]:checked + label {
+            background-color: #1b4d3e;
+            color: #ffffff;
+            border-color: #1b4d3e;
             font-weight: bold;
         }
 
-        .gender-male {
-            background: #e0f2fe;
-            color: #0369a1;
+        /* Attendance Radio Accent Colors */
+        .radio-options.attendance-group input[value="ተገኝቷል"]:checked + label {
+            background-color: #27ae60; border-color: #27ae60;
+        }
+        .radio-options.attendance-group input[value="ቀሪ"]:checked + label {
+            background-color: #c0392b; border-color: #c0392b;
+        }
+        .radio-options.attendance-group input[value="ፈቃድ"]:checked + label {
+            background-color: #d35400; border-color: #d35400;
         }
 
-        .gender-female {
-            background: #fce7f3;
-            color: #be185d;
+        /* Days Grid Style */
+        .days-group label {
+            min-width: 38px;
+            text-align: center;
+            padding: 6px 8px;
         }
 
-        .select-status, .select-role, .select-category {
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .select-status.present {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-
-        .select-status.absent {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-
-        .select-status.permitted {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        .actions-bar {
-            margin-top: 1.5rem;
+        /* Buttons */
+        .btn-holder {
             display: flex;
             justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
         }
-
-        .btn-export {
-            background-color: var(--success);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
+        .btn {
+            padding: 12px 22px;
+            font-size: 1rem;
             font-weight: bold;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
+        .btn-submit { background-color: #1b4d3e; }
+        .btn-export { background-color: #27ae60; }
+        .btn-edit { background-color: #f39c12; padding: 5px 10px; font-size: 0.85rem; }
+        .btn-delete { background-color: #c0392b; padding: 5px 10px; font-size: 0.85rem; }
 
-        /* Modal Popup Styling */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        hr {
+            margin: 25px 0;
+            border: 0;
+            border-top: 1px solid #dddddd;
         }
 
-        .modal-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
+        /* Data Table */
+        .table-container {
+            overflow-x: auto;
+        }
+        .data-table {
             width: 100%;
-            max-width: 450px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-collapse: collapse;
+            margin-top: 15px;
         }
-
-        .modal-card h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
+        .data-table th, .data-table td {
+            padding: 10px;
+            border: 1px solid #dddddd;
+            text-align: center;
+            font-size: 0.85rem;
         }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .error-message {
-            color: var(--danger);
-            font-size: 0.8rem;
-            margin-top: 0.4rem;
-            display: none;
-        }
+        .data-table th { background-color: #1b4d3e; color: white; }
+        .txt-present { color: #27ae60; font-weight: bold; }
+        .txt-absent { color: #c0392b; font-weight: bold; }
+        .txt-permission { color: #d35400; font-weight: bold; }
+        .signature-col { width: 100px; min-width: 90px; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN CONTAINER -->
-    <div class="login-container" id="loginScreen">
-        <div class="login-card">
-            <h2>ፅዱ ቤተሰብ</h2>
-            <p>Authorized Personnel Attendance Portal</p>
-            <form id="loginForm">
+    <div class="main-card">
+        <h2>የፅዱ ቤተሰብ ወርሃዊ የክትትል መመዝገቢያ</h2>
+
+        <!-- Enhanced Dashboard Summary -->
+        <div class="dashboard-section">
+            <div class="dashboard-title">የመገኘት እና የጾታ ስብጥር ማጠቃለያ</div>
+            <div class="stats-container">
+                <div class="stat-box bg-total">
+                    <h5>ጠቅላላ አባላት</h5>
+                    <p class="num" id="txtTotal">0</p>
+                    <p class="sub" id="txtTotalGender">(ወ: 0 | ሴ: 0)</p>
+                </div>
+                <div class="stat-box bg-present">
+                    <h5>ተገኝቷል</h5>
+                    <p class="num" id="txtPresent">0</p>
+                    <p class="sub" id="txtPresentGender">(ወ: 0 | ሴ: 0)</p>
+                </div>
+                <div class="stat-box bg-absent">
+                    <h5>ቀሪ</h5>
+                    <p class="num" id="txtAbsent">0</p>
+                    <p class="sub" id="txtAbsentGender">(ወ: 0 | ሴ: 0)</p>
+                </div>
+                <div class="stat-box bg-permission">
+                    <h5>ፈቃድ</h5>
+                    <p class="num" id="txtPermission">0</p>
+                    <p class="sub" id="txtPermissionGender">(ወ: 0 | ሴ: 0)</p>
+                </div>
+            </div>
+
+            <div class="dashboard-title" style="margin-top: 15px;">የአባልነት ሁኔታ ከጾታ ስብጥር ጋር</div>
+            <div class="member-stats-grid">
+                <div class="member-stat-card">
+                    <h6>ሙሉ አባል</h6>
+                    <div class="val" id="txtFullMember">0</div>
+                    <div class="sub-val" id="txtFullMemberGender">ወ: 0 | ሴ: 0</div>
+                </div>
+                <div class="member-stat-card">
+                    <h6>እጩ አባል</h6>
+                    <div class="val" id="txtCandidateMember">0</div>
+                    <div class="sub-val" id="txtCandidateMemberGender">ወ: 0 | ሴ: 0</div>
+                </div>
+                <div class="member-stat-card">
+                    <h6>ደጋፊ አባል</h6>
+                    <div class="val" id="txtSupportMember">0</div>
+                    <div class="sub-val" id="txtSupportMemberGender">ወ: 0 | ሴ: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="attendanceForm">
+            <input type="hidden" id="editIndex" value="-1">
+
+            <div class="form-grid">
+                <!-- 1. Full Name -->
                 <div class="form-group">
-                    <label for="loginUsername">ተጠቃሚ ስም (Username)</label>
-                    <input type="text" id="loginUsername" placeholder="Enter username" value="Admin" required>
+                    <label for="fullName">1. ሙሉ ስም</label>
+                    <input type="text" id="fullName" class="text-input" placeholder="የአባሉን ሙሉ ስም ያስገቡ" required>
                 </div>
+
+                <!-- 2. Title -->
                 <div class="form-group">
-                    <label for="loginPassword">የመግቢያ ቃል (Password)</label>
-                    <input type="password" id="loginPassword" placeholder="Enter password" value="Admin123" required>
+                    <label>2. ማዕረግ</label>
+                    <div class="radio-options">
+                        <input type="radio" id="t1" name="title" value="አቶ" required><label for="t1">አቶ</label>
+                        <input type="radio" id="t2" name="title" value="ወ/ሮ"><label for="t2">ወ/ሮ</label>
+                        <input type="radio" id="t3" name="title" value="ወ/ሪት"><label for="t3">ወ/ሪት</label>
+                        <input type="radio" id="t4" name="title" value="ዶ/ር"><label for="t4">ዶ/ር</label>
+                        <input type="radio" id="t5" name="title" value="ኢንጂነር"><label for="t5">ኢንጂነር</label>
+                        <input type="radio" id="t6" name="title" value="መምህር"><label for="t6">መምህር</label>
+                    </div>
                 </div>
-                <div class="error-message" id="loginError">ተጠቃሚ ስም ወይም የይለፍ ቃል አልተገኘም። (Invalid Credentials)</div>
-                <button type="submit" class="btn" style="margin-top:1rem;">Log In</button>
-            </form>
-        </div>
-    </div>
 
-    <!-- APP CONTAINER -->
-    <div class="app-container" id="appScreen">
-        <header>
-            <div>
-                <h2>ፅዱ ቤተሰብ የኣባላት መገኘት መቆጣጠሪያ</h2>
-                <div class="header-date-box">
-                    <label style="font-size:0.85rem; font-weight:600; color:#64748b;">ቀን (የኢትዮጵያ ዘመን አቆጣጠር):</label>
-                    <select id="ethDay" onchange="renderTable()"></select>
-                    <select id="ethMonth" onchange="updateEthDayOptions(); renderTable()"></select>
-                    <select id="ethYear" onchange="updateEthDayOptions(); renderTable()"></select>
+                <!-- 3. Gender -->
+                <div class="form-group">
+                    <label>3. ጾታ</label>
+                    <div class="radio-options">
+                        <input type="radio" id="g1" name="gender" value="ወንድ" required><label for="g1">ወንድ</label>
+                        <input type="radio" id="g2" name="gender" value="ሴት"><label for="g2">ሴት</label>
+                    </div>
+                </div>
+
+                <!-- 4. Membership Status -->
+                <div class="form-group">
+                    <label>4. የአባልነት ሁኔታ</label>
+                    <div class="radio-options">
+                        <input type="radio" id="m1" name="membershipStatus" value="ሙሉ አባል" required><label for="m1">ሙሉ አባል</label>
+                        <input type="radio" id="m2" name="membershipStatus" value="እጩ አባል"><label for="m2">እጩ አባል</label>
+                        <input type="radio" id="m3" name="membershipStatus" value="ደጋፊ አባል"><label for="m3">ደጋፊ አባል</label>
+                    </div>
+                </div>
+
+                <!-- 5. Role -->
+                <div class="form-group">
+                    <label>5. የኃላፊነት ሚና</label>
+                    <div class="radio-options">
+                        <input type="radio" id="r1" name="role" value="አመራር" required><label for="r1">አመራር</label>
+                        <input type="radio" id="r2" name="role" value="ተተኪ አመራር"><label for="r2">ተተኪ አመራር</label>
+                        <input type="radio" id="r3" name="role" value="ግንባር ቀደም አባል"><label for="r3">ግንባር ቀደም አባል</label>
+                        <input type="radio" id="r4" name="role" value="አባል"><label for="r4">አባል</label>
+                    </div>
+                </div>
+
+                <!-- 6. Year -->
+                <div class="form-group">
+                    <label for="ethYear">6. ዓመተ ምሕረት</label>
+                    <input type="number" id="ethYear" class="text-input" style="max-width: 200px;" value="2018" min="2000" max="2100" required>
+                </div>
+
+                <!-- 7. Month Chips -->
+                <div class="form-group">
+                    <label>7. ወር</label>
+                    <div class="radio-options" id="monthContainer">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- 8. Day Chips -->
+                <div class="form-group">
+                    <label>8. ቀን</label>
+                    <div class="radio-options days-group" id="dayContainer">
+                        <!-- Dynamically populated -->
+                    </div>
+                </div>
+
+                <!-- 9. Presence Status -->
+                <div class="form-group">
+                    <label>9. የመገኘት ሁኔታ</label>
+                    <div class="radio-options attendance-group">
+                        <input type="radio" id="a1" name="attendance" value="ተገኝቷል" required><label for="a1">ተገኝቷል</label>
+                        <input type="radio" id="a2" name="attendance" value="ቀሪ"><label for="a2">ቀሪ</label>
+                        <input type="radio" id="a3" name="attendance" value="ፈቃድ"><label for="a3">ፈቃድ</label>
+                    </div>
+                </div>
+
+                <div class="btn-holder">
+                    <button type="submit" id="saveBtn" class="btn btn-submit">መዝግብ</button>
+                    <button type="button" class="btn btn-export" id="exportBtn">ወደ CSV ላክ</button>
                 </div>
             </div>
-            <div class="user-info">
-                <span>ተጠቃሚ:</span>
-                <span class="user-badge" id="displayUsername">Admin</span>
-                <button class="btn-action" onclick="openCredsModal()">Change Credentials</button>
-                <button class="btn-action btn-add-member" onclick="openAddMemberModal()">+ Add New Member</button>
-                <button class="btn-action" onclick="logout()">Logout</button>
-            </div>
-        </header>
+        </form>
 
-        <!-- STATS WITH GENDER AND PERMISSION SUMMARY -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">ጠቅላላ አባላት</p>
-                <h3 id="statTotal">0</h3>
-            </div>
-            <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">የተገኙ</p>
-                <h3 id="statPresent" style="color: var(--success);">0</h3>
-            </div>
-            <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">የቀሩ</p>
-                <h3 id="statAbsent" style="color: var(--danger);">0</h3>
-            </div>
-            <div class="stat-card">
-                <p style="color:var(--warning); font-size:0.85rem;">ፈቃድ</p>
-                <h3 id="statPermitted" style="color: var(--warning);">0</h3>
-            </div>
-            <div class="stat-card">
-                <p style="color:var(--female-color); font-size:0.85rem;">ሴት</p>
-                <h3 id="statFemale" style="color: var(--female-color);">0</h3>
-                <small id="statFemaleBreakdown">0 የተገኙ | 0 ፈቃድ</small>
-            </div>
-            <div class="stat-card">
-                <p style="color:var(--male-color); font-size:0.85rem;">ወንድ</p>
-                <h3 id="statMale" style="color: var(--male-color);">0</h3>
-                <small id="statMaleBreakdown">0 የተገኙ | 0 ፈቃድ</small>
-            </div>
-            <div class="stat-card">
-                <p style="color:#64748b; font-size:0.85rem;">የመገኘት መጠን</p>
-                <h3 id="statRate">0%</h3>
-            </div>
-        </div>
+        <hr>
 
-        <!-- CONTROLS -->
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search member name..." oninput="renderTable()">
-            </div>
-            <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-                <label style="font-size:0.85rem; font-weight:600;">ፆታ:</label>
-                <select id="filterGender" class="filter-select" onchange="renderTable()">
-                    <option value="ALL">ሁሉንም ፆታ</option>
-                    <option value="ሴት">ሴት</option>
-                    <option value="ወንድ">ወንድ</option>
-                </select>
-
-                <label style="font-size:0.85rem; font-weight:600; margin-left:0.5rem;">የአባልነት ሁኔታ:</label>
-                <select id="filterCategory" class="filter-select" onchange="renderTable()">
-                    <option value="ALL">ሁሉንም ዘርፍ</option>
-                    <option value="ሙሉ አባል">ሙሉ አባል</option>
-                    <option value="እጩ አባል">እጩ አባል</option>
-                    <option value="ደጋፊ አባል">ደጋፊ አባል</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- TABLE -->
+        <h3>የተመዘገቡ አባላት ዝርዝር</h3>
         <div class="table-container">
-            <table>
+            <table class="data-table">
                 <thead>
                     <tr>
                         <th>ተ.ቁ</th>
-                        <th>ቀን (ዓ.ም)</th>
-                        <th>ሙሉ ስም</th>
-                        <th>ፆታ</th>
-                        <th>የአባልነት ሁኔታ</th>
-                        <th>የኃላፊነት ሚና</th>
-                        <th>የመገኘት ሁኔታ</th>
+                        <th>ማዕረግ</th>
+                        <th>ስም</th>
+                        <th>ጾታ</th>
+                        <th>አባልነት</th>
+                        <th>ሚና</th>
+                        <th>ቀን</th>
+                        <th>ሁኔታ</th>
+                        <th class="signature-col">ፊርማ</th>
+                        <th>ተግባር</th>
                     </tr>
                 </thead>
-                <tbody id="memberTableBody">
-                    <!-- Populated by JavaScript -->
+                <tbody id="recordTableBody">
                 </tbody>
             </table>
-        </div>
-
-        <div class="actions-bar">
-            <button class="btn-export" onclick="exportCSV()">Export Attendance CSV</button>
-        </div>
-    </div>
-
-    <!-- MODAL: CHANGE CREDENTIALS -->
-    <div class="modal-overlay" id="credsModal">
-        <div class="modal-card">
-            <h3>የመግቢያ መረጃ መቀየሪያ (Change Credentials)</h3>
-            <form id="credsForm">
-                <div class="form-group">
-                    <label for="newUsername">አዲስ ተጠቃሚ ስም (New Username)</label>
-                    <input type="text" id="newUsername" required>
-                </div>
-                <div class="form-group">
-                    <label for="currentPassword">ነባር የይለፍ ቃል (Current Password)</label>
-                    <input type="password" id="currentPassword" required>
-                </div>
-                <div class="form-group">
-                    <label for="newPassword">አዲስ የይለፍ ቃል (New Password)</label>
-                    <input type="password" id="newPassword" required>
-                    <div class="password-hint">Restrictions: Min 6 chars, at least 1 uppercase, 1 lowercase & 1 digit.</div>
-                </div>
-                <div class="form-group">
-                    <label for="confirmPassword">አዲስ የይለፍ ቃል ያረጋግጡ (Confirm New Password)</label>
-                    <input type="password" id="confirmPassword" required>
-                </div>
-                <div class="error-message" id="credsError"></div>
-
-                <div class="modal-actions">
-                    <button type="submit" class="btn">Update Credentials</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeCredsModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: ADD NEW MEMBER -->
-    <div class="modal-overlay" id="addMemberModal">
-        <div class="modal-card">
-            <h3>አዲስ አባል መመዝገቢያ</h3>
-            <form id="addMemberForm">
-                <div class="form-group">
-                    <label for="newTitle">ማዕረግ</label>
-                    <select id="newTitle">
-                        <option value="ወ/ሮ">ወ/ሮ</option>
-                        <option value="አቶ">አቶ</option>
-                        <option value="ወ/ሪት">ወ/ሪት</option>
-                        <option value="ዶ/ር">ዶ/ር</option>
-                        <option value="ሲ/ር">ሲ/ር</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="newName">ሙሉ ስም</label>
-                    <input type="text" id="newName" placeholder="e.g. አበበ ከበደ" required>
-                </div>
-                <div class="form-group">
-                    <label for="newGender">ፆታ</label>
-                    <select id="newGender" required>
-                        <option value="ሴት">ሴት</option>
-                        <option value="ወንድ">ወንድ</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="newCategory">የአባልነት ሁኔታ</label>
-                    <select id="newCategory" onchange="handleNewCategoryChange(this.value)" required>
-                        <option value="ሙሉ አባል">ሙሉ አባል</option>
-                        <option value="እጩ አባል">እጩ አባል</option>
-                        <option value="ደጋፊ አባል">ደጋፊ አባል</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="newRole">የኃላፊነት ሚና</label>
-                    <select id="newRole">
-                        <option value="አመራር">አመራር</option>
-                        <option value="ተተኪ አመራር">ተተኪ አመራር</option>
-                        <option value="ግንባር ቀደም አባል">ግንባር ቀደም አባል</option>
-                        <option value="አባል" selected>አባል</option>
-                    </select>
-                </div>
-
-                <div class="modal-actions">
-                    <button type="submit" class="btn">Add Member</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeAddMemberModal()">Cancel</button>
-                </div>
-            </form>
         </div>
     </div>
 
     <script>
-        // System Credentials Store
-        let authCredentials = {
-            username: "Admin",
-            password: "Admin123"
-        };
+        var listData = [];
+        var monthsList = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
 
-        // Ethiopian Calendar Month Names
-        const ethMonths = [
-            "መስከረም", "ጥቅምት", "ህዳር", "ታህሳስ", "ጥር", "የካቲት",
-            "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"
-        ];
-
-        // Dataset using Amharic gender terms (ሴት / ወንድ) and categories (ሙሉ አባል, እጩ አባል, ደጋፊ አባል)
-        const membersData = [
-            { id: 1, name: "ወ/ሮ ሊድያ መሀመድ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 2, name: "ወ/ሮ ሲሳይ ተፈራ", gender: "ሴት", category: "ሙሉ አባል", role: "አመራር", status: "Absent" },
-            { id: 3, name: "ወ/ሮ ቤተልሄም ኪሮስ ለማ", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
-            { id: 4, name: "አቶ ተስፋሁን ፍስሃ ሞሃ", gender: "ወንድ", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
-            { id: 5, name: "ወ/ሮ ትግስት አበራ መንበረ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 6, name: "ወ/ሮ ትግስት ግዛው አምደመስቀል", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
-            { id: 7, name: "ወ/ሮ አይናለም ይርጋ ላቀው", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Present" },
-            { id: 8, name: "ወ/ሮ እመቤት ከበደ ይፍሩ", gender: "ሴት", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
-            { id: 9, name: "አቶ ያሬድ ሽፈራው ሳህሌ", gender: "ወንድ", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 10, name: "ወ/ሮ ኮከቤ ታደሰ ተሰማ", gender: "ሴት", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Present" },
-            { id: 11, name: "ወ/ሮ ዘውዴ በላይ ጓንጉል", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 12, name: "ወ/ሮ የሺህሃረግ ወ/አረጋይ ተሰማ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 13, name: "አቶ ይስሃቅ ሽመልሽ አሰፋ", gender: "ወንድ", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Absent" },
-            { id: 14, name: "ወ/ሮ ግንዛቤ አሰፋ ላቀው", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 15, name: "ወ/ሪት ፂዎን በየነ ተስፋዬ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 16, name: "ዶ/ር ፍቃዱ አዱኛ ቀነዓ", gender: "ወንድ", category: "ሙሉ አባል", role: "አመራር", status: "Present" },
-            { id: 17, name: "ሲ/ር ሲንቦኔ ካባ ረጋሳ", gender: "ሴት", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 18, name: "አቶ ሰሎሞን ተማረ ብርሃኑ", gender: "ወንድ", category: "ሙሉ አባል", role: "ተተኪ አመራር", status: "Present" },
-            { id: 19, name: "ዶ/ር ሀብታሙ መኮንን ከሰሳ", gender: "ወንድ", category: "ሙሉ አባል", role: "ግንባር ቀደም አባል", status: "Absent" },
-            { id: 20, name: "አቶ ዳዊት ደስታ ተሻለ", gender: "ወንድ", category: "ደጋፊ አባል", role: "-", status: "Present" },
-            { id: 21, name: "አቶ ተካልኝ ገነቲ ያዴሳ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Absent" },
-            { id: 22, name: "ወ/ሮ ለምለም በየነ ቦጋለ", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Absent" },
-            { id: 23, name: "ወ/ሮ ጤና ደመቀ", gender: "ሴት", category: "ደጋፊ አባል", role: "-", status: "Absent" },
-            { id: 24, name: "ዶ/ር ሰለሞን አበበ ከበደ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Present" },
-            { id: 25, name: "አቶ ግርማው ወንድምአለም ተስፋዬ", gender: "ወንድ", category: "እጩ አባል", role: "-", status: "Absent" },
-            { id: 26, name: "ሲ/ር እታገኝ አዲሱ ገላው", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Present" },
-            { id: 27, name: "ወ/ሪት እመቤት አጥላው አበበ", gender: "ሴት", category: "እጩ አባል", role: "-", status: "Absent" }
-        ];
-
-        // Check if Ethiopian Year is a Leap Year (year % 4 === 3)
-        function isEthiopianLeapYear(ethYear) {
-            return (ethYear % 4 === 3);
-        }
-
-        // Get max days in an Ethiopian Month
-        function getEthMonthMaxDays(monthName, ethYear) {
-            if (monthName === "ጳጉሜ") {
-                return isEthiopianLeapYear(ethYear) ? 6 : 5;
-            }
-            return 30;
-        }
-
-        // Gregorian to Ethiopian Date Conversion Logic
-        function getEthiopianDate(gdate = new Date()) {
-            const year = gdate.getFullYear();
-            const month = gdate.getMonth() + 1;
-            const date = gdate.getDate();
-
-            let newYearDay = ((year % 4 === 3) ? 12 : 11);
-            let ethYear = year - 8;
-            if (month < 9 || (month === 9 && date < newYearDay)) {
-                ethYear = year - 8;
-            } else {
-                ethYear = year - 7;
-            }
-
-            const newYearDate = new Date(year, 8, newYearDay);
-            let diffDays = 0;
-
-            if (gdate >= newYearDate) {
-                diffDays = Math.floor((gdate - newYearDate) / (1000 * 60 * 60 * 24));
-            } else {
-                const prevNewYearDay = (((year - 1) % 4 === 3) ? 12 : 11);
-                const prevNewYearDate = new Date(year - 1, 8, prevNewYearDay);
-                diffDays = Math.floor((gdate - prevNewYearDate) / (1000 * 60 * 60 * 24));
-            }
-
-            let ethMonthIndex = Math.floor(diffDays / 30);
-            let ethDay = (diffDays % 30) + 1;
-
-            if (ethMonthIndex >= 12) {
-                ethMonthIndex = 12; // ጳጉሜ (Pagume)
-                // Cap day for Pagume
-                const maxPagumeDays = isEthiopianLeapYear(ethYear) ? 6 : 5;
-                if (ethDay > maxPagumeDays) ethDay = maxPagumeDays;
-            }
-
-            return {
-                day: ethDay,
-                monthIndex: ethMonthIndex,
-                monthName: ethMonths[ethMonthIndex],
-                year: ethYear
-            };
-        }
-
-        function updateEthDayOptions() {
-            const daySelect = document.getElementById('ethDay');
-            const selectedMonth = document.getElementById('ethMonth').value;
-            const selectedYear = parseInt(document.getElementById('ethYear').value) || 2018;
-
-            const maxDays = getEthMonthMaxDays(selectedMonth, selectedYear);
-            const currentSelectedDay = parseInt(daySelect.value) || 1;
-
-            daySelect.innerHTML = '';
-            for (let i = 1; i <= maxDays; i++) {
-                const opt = document.createElement('option');
-                opt.value = i;
-                opt.innerText = i;
-                if (i === Math.min(currentSelectedDay, maxDays)) opt.selected = true;
-                daySelect.appendChild(opt);
+        // Init Month Buttons
+        function buildMonthChips() {
+            var container = document.getElementById('monthContainer');
+            container.innerHTML = "";
+            for (var i = 0; i < monthsList.length; i++) {
+                var m = monthsList[i];
+                var id = "m_chip_" + i;
+                var checked = (i === 0) ? "checked" : "";
+                
+                var html = '<input type="radio" id="' + id + '" name="ethMonth" value="' + m + '" ' + checked + ' onchange="onMonthChange()">' +
+                           '<label for="' + id + '">' + m + '</label>';
+                container.innerHTML += html;
             }
         }
 
-        function initEthiopianDateSelectors() {
-            const todayEth = getEthiopianDate(new Date());
+        // Init Day Buttons based on selected month
+        function buildDayChips(maxDays) {
+            var container = document.getElementById('dayContainer');
+            var selectedDay = getRadioValue('ethDay');
+            container.innerHTML = "";
 
-            const monthSelect = document.getElementById('ethMonth');
-            const yearSelect = document.getElementById('ethYear');
-
-            monthSelect.innerHTML = '';
-            ethMonths.forEach((m, idx) => {
-                const opt = document.createElement('option');
-                opt.value = m;
-                opt.innerText = m;
-                if (idx === todayEth.monthIndex) opt.selected = true;
-                monthSelect.appendChild(opt);
-            });
-
-            yearSelect.innerHTML = '';
-            for (let y = todayEth.year - 5; y <= todayEth.year + 5; y++) {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.innerText = `${y} ዓ.ም`;
-                if (y === todayEth.year) opt.selected = true;
-                yearSelect.appendChild(opt);
-            }
-
-            updateEthDayOptions();
-            document.getElementById('ethDay').value = todayEth.day;
-        }
-
-        function getSelectedEthiopianDateString() {
-            const day = document.getElementById('ethDay').value;
-            const month = document.getElementById('ethMonth').value;
-            const year = document.getElementById('ethYear').value;
-            return `${day} ${month} ${year} ዓ.ም`;
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initEthiopianDateSelectors();
-        });
-
-        // Login Handler
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const userVal = document.getElementById('loginUsername').value.trim();
-            const passVal = document.getElementById('loginPassword').value;
-            const errorElement = document.getElementById('loginError');
-
-            if (userVal === authCredentials.username && passVal === authCredentials.password) {
-                errorElement.style.display = 'none';
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appScreen').style.display = 'block';
-                document.getElementById('displayUsername').innerText = authCredentials.username;
-                initApp();
-            } else {
-                errorElement.innerText = "የተሳሳተ ተጠቃሚ ስም ወይም የይለፍ ቃል! (Invalid username or password)";
-                errorElement.style.display = 'block';
-            }
-        });
-
-        function logout() {
-            document.getElementById('appScreen').style.display = 'none';
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('loginPassword').value = '';
-        }
-
-        function initApp() {
-            renderTable();
-        }
-
-        /* Credentials Management Modal & Restrictions */
-        function openCredsModal() {
-            document.getElementById('credsModal').style.display = 'flex';
-            document.getElementById('newUsername').value = authCredentials.username;
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-            document.getElementById('credsError').style.display = 'none';
-        }
-
-        function closeCredsModal() {
-            document.getElementById('credsModal').style.display = 'none';
-        }
-
-        function validatePasswordRestrictions(password) {
-            const minLength = password.length >= 6;
-            const hasUpper = /[A-Z]/.test(password);
-            const hasLower = /[a-z]/.test(password);
-            const hasNumber = /[0-9]/.test(password);
-
-            return minLength && hasUpper && hasLower && hasNumber;
-        }
-
-        document.getElementById('credsForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newUsername = document.getElementById('newUsername').value.trim();
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const errorElement = document.getElementById('credsError');
-
-            if (currentPassword !== authCredentials.password) {
-                errorElement.innerText = "ነባር የይለፍ ቃል የተሳሳተ ነው! (Current password is incorrect)";
-                errorElement.style.display = 'block';
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                errorElement.innerText = "አዲስ የይለፍ ቃሎች አይመሳሰሉም! (New passwords do not match)";
-                errorElement.style.display = 'block';
-                return;
-            }
-
-            if (!validatePasswordRestrictions(newPassword)) {
-                errorElement.innerText = "የይለፍ ቃል መስፈርቱን አላሟላም! (Min 6 chars, uppercase, lowercase & digit required)";
-                errorElement.style.display = 'block';
-                return;
-            }
-
-            authCredentials.username = newUsername;
-            authCredentials.password = newPassword;
-            document.getElementById('displayUsername').innerText = authCredentials.username;
-
-            alert("የመግቢያ መረጃ በተሳካ ሁኔታ ተቀይሯል። (Credentials updated successfully!)");
-            closeCredsModal();
-        });
-
-        /* Add Member Modal Logic */
-        function openAddMemberModal() {
-            document.getElementById('addMemberModal').style.display = 'flex';
-            handleNewCategoryChange(document.getElementById('newCategory').value);
-        }
-
-        function closeAddMemberModal() {
-            document.getElementById('addMemberModal').style.display = 'none';
-            document.getElementById('addMemberForm').reset();
-        }
-
-        function handleNewCategoryChange(category) {
-            const roleSelect = document.getElementById('newRole');
-            if (category === 'ሙሉ አባል') {
-                roleSelect.disabled = false;
-            } else {
-                roleSelect.disabled = true;
-                roleSelect.value = '-';
-            }
-        }
-
-        document.getElementById('addMemberForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('newTitle').value;
-            const rawName = document.getElementById('newName').value.trim();
-            const gender = document.getElementById('newGender').value;
-            const category = document.getElementById('newCategory').value;
-            const role = category === 'ሙሉ አባል' ? document.getElementById('newRole').value : '-';
-
-            const fullName = `${title} ${rawName}`;
-            const newId = membersData.length + 1;
-
-            membersData.push({
-                id: newId,
-                name: fullName,
-                gender: gender,
-                category: category,
-                role: role,
-                status: "Absent"
-            });
-
-            alert(`Member "${fullName}" registered successfully!`);
-            closeAddMemberModal();
-            renderTable();
-        });
-
-        function updateAttendance(id, newStatus) {
-            const member = membersData.find(m => m.id === id);
-            if (member) {
-                member.status = newStatus;
-                updateStats();
-            }
-        }
-
-        function updateCategory(id, newCategory) {
-            const member = membersData.find(m => m.id === id);
-            if (member) {
-                member.category = newCategory;
-                if (newCategory === 'ሙሉ አባል') {
-                    if (!member.role || member.role === '-') {
-                        member.role = 'አባል';
-                    }
-                } else {
-                    member.role = '-';
+            for (var i = 1; i <= maxDays; i++) {
+                var id = "d_chip_" + i;
+                var checked = "";
+                if (selectedDay) {
+                    if (parseInt(selectedDay) === i) checked = "checked";
+                } else if (i === 1) {
+                    checked = "checked";
                 }
-                renderTable();
+
+                var html = '<input type="radio" id="' + id + '" name="ethDay" value="' + i + '" ' + checked + ' required>' +
+                           '<label for="' + id + '">' + i + '</label>';
+                container.innerHTML += html;
             }
         }
 
-        function updateRole(id, newRole) {
-            const member = membersData.find(m => m.id === id);
-            if (member) {
-                member.role = newRole;
+        function onMonthChange() {
+            var m = getRadioValue('ethMonth');
+            if (m === "ጳጉሜ") {
+                buildDayChips(6);
+            } else {
+                buildDayChips(30);
+            }
+        }
+
+        function getRadioValue(name) {
+            var ele = document.getElementsByName(name);
+            for (var i = 0; i < ele.length; i++) {
+                if (ele[i].checked) return ele[i].value;
+            }
+            return "";
+        }
+
+        function setRadioValue(name, val) {
+            var ele = document.getElementsByName(name);
+            for (var i = 0; i < ele.length; i++) {
+                if (ele[i].value == val) {
+                    ele[i].checked = true;
+                } else {
+                    ele[i].checked = false;
+                }
             }
         }
 
         function updateStats() {
-            const total = membersData.length;
-            const present = membersData.filter(m => m.status === 'Present').length;
-            const absent = membersData.filter(m => m.status === 'Absent').length;
-            const permitted = membersData.filter(m => m.status === 'Permitted').length;
-            const rate = total > 0 ? Math.round((present / total) * 100) : 0;
+            var total = listData.length;
+            var totalM = 0, totalF = 0;
+            var presM = 0, presF = 0;
+            var absM = 0, absF = 0;
+            var permM = 0, permF = 0;
 
-            const females = membersData.filter(m => m.gender === 'ሴት');
-            const males = membersData.filter(m => m.gender === 'ወንድ');
+            var fullM = 0, fullF = 0;
+            var candM = 0, candF = 0;
+            var suppM = 0, suppF = 0;
 
-            const femalePresent = females.filter(m => m.status === 'Present').length;
-            const femalePermitted = females.filter(m => m.status === 'Permitted').length;
+            for (var i = 0; i < listData.length; i++) {
+                var d = listData[i];
+                var isMale = (d.gender === "ወንድ");
+                var isFemale = (d.gender === "ሴት");
 
-            const malePresent = males.filter(m => m.status === 'Present').length;
-            const malePermitted = males.filter(m => m.status === 'Permitted').length;
+                if (isMale) totalM++;
+                if (isFemale) totalF++;
 
-            document.getElementById('statTotal').innerText = total;
-            document.getElementById('statPresent').innerText = present;
-            document.getElementById('statAbsent').innerText = absent;
-            document.getElementById('statPermitted').innerText = permitted;
-            document.getElementById('statRate').innerText = `${rate}%`;
+                // Attendance Status
+                if (d.attendance === "ተገኝቷል") {
+                    if (isMale) presM++;
+                    if (isFemale) presF++;
+                } else if (d.attendance === "ቀሪ") {
+                    if (isMale) absM++;
+                    if (isFemale) absF++;
+                } else if (d.attendance === "ፈቃድ") {
+                    if (isMale) permM++;
+                    if (isFemale) permF++;
+                }
 
-            document.getElementById('statFemale').innerText = females.length;
-            document.getElementById('statFemaleBreakdown').innerText = `${femalePresent} የተገኙ | ${femalePermitted} ፈቃድ`;
+                // Membership Status
+                if (d.membershipStatus === "ሙሉ አባል") {
+                    if (isMale) fullM++;
+                    if (isFemale) fullF++;
+                } else if (d.membershipStatus === "እጩ አባል") {
+                    if (isMale) candM++;
+                    if (isFemale) candF++;
+                } else if (d.membershipStatus === "ደጋፊ አባል") {
+                    if (isMale) suppM++;
+                    if (isFemale) suppF++;
+                }
+            }
 
-            document.getElementById('statMale').innerText = males.length;
-            document.getElementById('statMaleBreakdown').innerText = `${malePresent} የተገኙ | ${malePermitted} ፈቃድ`;
+            // Attendance Totals
+            document.getElementById('txtTotal').textContent = total;
+            document.getElementById('txtTotalGender').textContent = "(ወ: " + totalM + " | ሴ: " + totalF + ")";
+
+            document.getElementById('txtPresent').textContent = (presM + presF);
+            document.getElementById('txtPresentGender').textContent = "(ወ: " + presM + " | ሴ: " + presF + ")";
+
+            document.getElementById('txtAbsent').textContent = (absM + absF);
+            document.getElementById('txtAbsentGender').textContent = "(ወ: " + absM + " | ሴ: " + absF + ")";
+
+            document.getElementById('txtPermission').textContent = (permM + permF);
+            document.getElementById('txtPermissionGender').textContent = "(ወ: " + permM + " | ሴ: " + permF + ")";
+
+            // Membership Aggregation
+            document.getElementById('txtFullMember').textContent = (fullM + fullF);
+            document.getElementById('txtFullMemberGender').textContent = "ወ: " + fullM + " | ሴ: " + fullF;
+
+            document.getElementById('txtCandidateMember').textContent = (candM + candF);
+            document.getElementById('txtCandidateMemberGender').textContent = "ወ: " + candM + " | ሴ: " + candF;
+
+            document.getElementById('txtSupportMember').textContent = (suppM + suppF);
+            document.getElementById('txtSupportMemberGender').textContent = "ወ: " + suppM + " | ሴ: " + suppF;
         }
 
         function renderTable() {
-            const tbody = document.getElementById('memberTableBody');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            const categoryFilter = document.getElementById('filterCategory').value;
-            const genderFilter = document.getElementById('filterGender').value;
-            const selectedEthDate = getSelectedEthiopianDateString();
+            var tbody = document.getElementById('recordTableBody');
+            tbody.innerHTML = "";
 
-            tbody.innerHTML = '';
-
-            const filtered = membersData.filter(m => {
-                const matchesSearch = m.name.toLowerCase().includes(search);
-                const matchesCategory = categoryFilter === 'ALL' || m.category === categoryFilter;
-                const matchesGender = genderFilter === 'ALL' || m.gender === genderFilter;
-                return matchesSearch && matchesCategory && matchesGender;
-            });
-
-            filtered.forEach(m => {
-                const tr = document.createElement('tr');
+            for (var i = 0; i < listData.length; i++) {
+                var item = listData[i];
+                var cssClass = "";
                 
-                const genderBadge = m.gender === 'ሴት' ? 'gender-female' : 'gender-male';
+                if (item.attendance === "ተገኝቷል") cssClass = "txt-present";
+                else if (item.attendance === "ቀሪ") cssClass = "txt-absent";
+                else if (item.attendance === "ፈቃድ") cssClass = "txt-permission";
 
-                // Editable Category Dropdown
-                let categoryTdContent = `
-                    <select class="select-category" onchange="updateCategory(${m.id}, this.value)">
-                        <option value="ሙሉ አባል" ${m.category === 'ሙሉ አባል' ? 'selected' : ''}>ሙሉ አባል</option>
-                        <option value="እጩ አባል" ${m.category === 'እጩ አባል' ? 'selected' : ''}>እጩ አባል</option>
-                        <option value="ደጋፊ አባል" ${m.category === 'ደጋፊ አባል' ? 'selected' : ''}>ደጋፊ አባል</option>
-                    </select>
-                `;
-
-                // Editable Role Dropdown
-                let roleTdContent = '';
-                if (m.category === 'ሙሉ አባል') {
-                    roleTdContent = `
-                        <select class="select-role" onchange="updateRole(${m.id}, this.value)">
-                            <option value="አመራር" ${m.role === 'አመራር' ? 'selected' : ''}>አመራር</option>
-                            <option value="ተተኪ አመራር" ${m.role === 'ተተኪ አመራር' ? 'selected' : ''}>ተተኪ አመራር</option>
-                            <option value="ግንባር ቀደም አባል" ${m.role === 'ግንባር ቀደም አባል' ? 'selected' : ''}>ግንባር ቀደም አባል</option>
-                            <option value="አባል" ${m.role === 'አባል' || !m.role ? 'selected' : ''}>አባል</option>
-                        </select>
-                    `;
-                } else {
-                    roleTdContent = `<span style="color:#94a3b8; font-size:0.85rem;">-</span>`;
-                }
-
-                tr.innerHTML = `
-                    <td>${m.id}</td>
-                    <td><span style="font-size:0.85rem; color:#475569; font-weight:600;">${selectedEthDate}</span></td>
-                    <td><strong>${m.name}</strong></td>
-                    <td><span class="badge ${genderBadge}">${m.gender}</span></td>
-                    <td>${categoryTdContent}</td>
-                    <td>${roleTdContent}</td>
-                    <td>
-                        <select class="select-status ${m.status.toLowerCase()}" onchange="updateAttendance(${m.id}, this.value); this.className = 'select-status ' + this.value.toLowerCase();">
-                            <option value="Present" ${m.status === 'Present' ? 'selected' : ''}>Present (ተገኝቷል/ታለች)</option>
-                            <option value="Absent" ${m.status === 'Absent' ? 'selected' : ''}>Absent (ቀሪ)</option>
-                            <option value="Permitted" ${m.status === 'Permitted' ? 'selected' : ''}>Permitted (ፍቃድ)</option>
-                        </select>
-                    </td>
-                `;
+                var tr = document.createElement('tr');
+                tr.innerHTML = 
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + item.title + '</td>' +
+                    '<td>' + item.fullName + '</td>' +
+                    '<td>' + item.gender + '</td>' +
+                    '<td>' + item.membershipStatus + '</td>' +
+                    '<td>' + item.role + '</td>' +
+                    '<td>' + item.dateStr + '</td>' +
+                    '<td class="' + cssClass + '">' + item.attendance + '</td>' +
+                    '<td class="signature-col">_________________</td>' +
+                    '<td>' +
+                        '<button class="btn btn-edit" onclick="editRow(' + i + ')">አርም</button> ' +
+                        '<button class="btn btn-delete" onclick="deleteRow(' + i + ')">ሰርዝ</button>' +
+                    '</td>';
                 tbody.appendChild(tr);
-            });
+            }
 
             updateStats();
         }
 
-        // Export CSV with Ethiopian Date & Amharic Terms
-        function exportCSV() {
-            const statusAmharicMap = {
-                "Present": "ተገኝቷል/ታለች",
-                "Absent": "ቀሪ",
-                "Permitted": "ፍቃድ"
-            };
-
-            const selectedEthDate = getSelectedEthiopianDateString();
-
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-            csvContent += "ID,Ethiopian Date,Full Name,Gender,Category,Role,Attendance Status\n";
+        function editRow(index) {
+            var d = listData[index];
+            document.getElementById('fullName').value = d.fullName;
+            setRadioValue('title', d.title);
+            setRadioValue('gender', d.gender);
+            setRadioValue('membershipStatus', d.membershipStatus);
+            setRadioValue('role', d.role);
+            document.getElementById('ethYear').value = d.ethYear;
             
-            membersData.forEach(m => {
-                const amharicStatus = statusAmharicMap[m.status] || m.status;
-                csvContent += `${m.id},"${selectedEthDate}","${m.name}","${m.gender}","${m.category}","${m.role || '-'}","${amharicStatus}"\n`;
-            });
+            setRadioValue('ethMonth', d.ethMonth);
+            onMonthChange();
+            setRadioValue('ethDay', d.ethDay);
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Tsidu_Beteseb_Attendance_${selectedEthDate.replace(/\s+/g, '_')}.csv`);
+            setRadioValue('attendance', d.attendance);
+
+            document.getElementById('editIndex').value = index;
+            document.getElementById('saveBtn').textContent = "አድስ (Update)";
+        }
+
+        function deleteRow(index) {
+            if (confirm("እርግጠኛ ነዎት ይህ መረጃ ይደለዝ?")) {
+                listData.splice(index, 1);
+                renderTable();
+            }
+        }
+
+        document.getElementById('exportBtn').onclick = function() {
+            if (listData.length === 0) {
+                alert("የሚላክ መረጃ የለም!");
+                return;
+            }
+
+            var csvText = "\uFEFFተ.ቁ,ማዕረግ,ሙሉ ስም,ጾታ,የአባልነት ሁኔታ,የኃላፊነት ሚና,ቀን,የመገኘት ሁኔታ,ፊርማ\n";
+            for (var i = 0; i < listData.length; i++) {
+                var o = listData[i];
+                csvText += (i + 1) + ',"' + o.title + '","' + o.fullName + '","' + o.gender + '","' + o.membershipStatus + '","' + o.role + '","' + o.dateStr + '","' + o.attendance + '",""\n';
+            }
+
+            var blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "Tsidu_Beteseb_Attendance.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
+
+        document.getElementById('attendanceForm').onsubmit = function(e) {
+            e.preventDefault();
+
+            var idx = parseInt(document.getElementById('editIndex').value);
+            
+            var entry = {
+                fullName: document.getElementById('fullName').value,
+                title: getRadioValue('title'),
+                gender: getRadioValue('gender'),
+                membershipStatus: getRadioValue('membershipStatus'),
+                role: getRadioValue('role'),
+                ethYear: document.getElementById('ethYear').value,
+                ethMonth: getRadioValue('ethMonth'),
+                ethDay: getRadioValue('ethDay'),
+                dateStr: getRadioValue('ethMonth') + " " + getRadioValue('ethDay') + "፣ " + document.getElementById('ethYear').value,
+                attendance: getRadioValue('attendance')
+            };
+
+            if (idx === -1) {
+                listData.push(entry);
+            } else {
+                listData[idx] = entry;
+                document.getElementById('editIndex').value = -1;
+                document.getElementById('saveBtn').textContent = "መዝግብ";
+            }
+
+            document.getElementById('attendanceForm').reset();
+            document.getElementById('ethYear').value = "2018";
+            buildMonthChips();
+            buildDayChips(30);
+
+            renderTable();
+        };
+
+        // Initialize UI
+        buildMonthChips();
+        buildDayChips(30);
     </script>
 </body>
 </html>
