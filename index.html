@@ -425,10 +425,9 @@
                         <input type="radio" id="t4" name="title" value="ዶ/ር"><label for="t4">ዶ/ር</label>
                         <input type="radio" id="t5" name="title" value="ኢንጂነር"><label for="t5">ኢንጂነር</label>
                         <input type="radio" id="t6" name="title" value="መምህር"><label for="t6">መምህር</label>
-
-                      <input type="radio" id="t7" name="title" value="ሚስ"><label for="t7">ሚስ</label>                   
-<input type="radio" id="t8" name="title" value="ሲ/ር"><label for="t8">ሲ/ር</label>
-                                         </div>
+                        <input type="radio" id="t7" name="title" value="ሚስ"><label for="t7">ሚስ</label>                   
+                        <input type="radio" id="t8" name="title" value="ሲ/ር"><label for="t8">ሲ/ር</label>
+                    </div>
                 </div>
 
                 <!-- 3. Gender -->
@@ -553,6 +552,23 @@
         var currentUser = null;
         var listData = [];
         var monthsList = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
+
+        // Load saved data from localStorage on startup
+        function loadSavedData() {
+            var saved = localStorage.getItem('tzidu_attendance_records');
+            if (saved) {
+                try {
+                    listData = JSON.parse(saved);
+                } catch (e) {
+                    listData = [];
+                }
+            }
+        }
+
+        // Save data array to localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('tzidu_attendance_records', JSON.stringify(listData));
+        }
 
         function updateDisplayTitle() {
             var val = document.getElementById('documentTitleInput').value.trim();
@@ -835,6 +851,7 @@
 
             if (confirm("እርግጠኛ ነዎት ይህ መረጃ ይደለዝ?")) {
                 listData.splice(index, 1);
+                saveDataToStorage();
                 renderTable();
             }
         }
@@ -888,6 +905,8 @@
                 document.getElementById('saveBtn').textContent = "መዝግብ";
             }
 
+            saveDataToStorage();
+
             document.getElementById('attendanceForm').reset();
             document.getElementById('ethYear').value = "2018";
             buildMonthChips();
@@ -896,9 +915,11 @@
             renderTable();
         };
 
-        // Initialize UI
+        // Initialize UI & Data
+        loadSavedData();
         buildMonthChips();
         buildDayChips(30);
+        renderTable();
     </script>
 </body>
 </html>
