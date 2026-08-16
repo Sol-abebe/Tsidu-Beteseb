@@ -74,7 +74,7 @@
             background: white;
             padding: 25px;
             border-radius: 8px;
-            width: 330px;
+            width: 350px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .login-box h4 {
@@ -310,23 +310,27 @@
             <h4>ስርዓቱ ውስጥ ይግቡ</h4>
             <div class="form-group" style="margin-bottom: 10px;">
                 <label>የተጠቃሚ ስም</label>
-                <input type="text" id="usernameInput" class="text-input" placeholder="admin ወይም user">
+                <input type="text" id="usernameInput" class="text-input" placeholder="የተጠቃሚ ስም ያስገቡ">
             </div>
             <div class="form-group">
                 <label>የይለፍ ቃል</label>
-                <input type="password" id="passwordInput" class="text-input" value="1234">
+                <input type="password" id="passwordInput" class="text-input" placeholder="የይለፍ ቃል ያስገቡ">
             </div>
             <button class="btn btn-login" onclick="handleLogin()">ይግቡ</button>
-            <p style="font-size: 0.75rem; color: #7f8c8d; margin-top: 10px; text-align: center;">
-                ተሞካሪዎች: <b>admin</b> / 1234 ወይም <b>user</b> / 1234
+            <p id="defaultCredNotice" style="font-size: 0.75rem; color: #7f8c8d; margin-top: 10px; text-align: center;">
+                የሙከራ: <b>admin</b> / 1234 ወይም <b>user</b> / 1234 <br> <strong>ከገቡ በኋላ በራስዎት ይቀይሩት</strong>
             </p>
         </div>
     </div>
 
-    <!-- Change Password Modal -->
+    <!-- Credentials Modification Modal -->
     <div class="modal-overlay" id="pwdModal" style="display: none;">
         <div class="login-box">
-            <h4>የይለፍ ቃል ቀይር</h4>
+            <h4>የመግቢያ መረጃ ቀይር</h4>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>አዲስ የተጠቃሚ ስም</label>
+                <input type="text" id="newUsernameInput" class="text-input" placeholder="አዲስ የተጠቃሚ ስም">
+            </div>
             <div class="form-group" style="margin-bottom: 10px;">
                 <label>የአሁኑ የይለፍ ቃል</label>
                 <input type="password" id="oldPwdInput" class="text-input" placeholder="የአሁኑን የይለፍ ቃል ያስገቡ">
@@ -339,7 +343,7 @@
                 <label>አዲሱን የይለፍ ቃል ያረጋግጡ</label>
                 <input type="password" id="confirmPwdInput" class="text-input" placeholder="አዲሱን የይለፍ ቃል ድጋሚ ያስገቡ">
             </div>
-            <button class="btn btn-login" onclick="handleChangePassword()">ቀይር</button>
+            <button class="btn btn-login" onclick="handleChangeCredentials()">አድስ / ቀይር</button>
             <button class="btn btn-cancel" onclick="closePwdModal()">ሰርዝ (Cancel)</button>
         </div>
     </div>
@@ -352,7 +356,7 @@
                 <span class="user-role-badge" id="lblRole">-</span>
             </div>
             <div class="auth-btns">
-                <button class="btn btn-change-pwd" id="btnChangePwd" onclick="openPwdModal()" style="display: none;">ይለፍ ቃል ቀይር</button>
+                <button class="btn btn-change-pwd" id="btnChangePwd" onclick="openPwdModal()" style="display: none;">መግቢያ ቀይር</button>
                 <button class="btn btn-logout" id="btnLogout" onclick="handleLogout()" style="display: none;">ውጣ (Logout)</button>
             </div>
         </div>
@@ -501,21 +505,21 @@
 
         <hr>
 
-        <!-- ADDED: Title Entry Field above the Table -->
+        <!-- Document Title Input -->
         <div class="form-group title-entry-container">
             <label for="documentTitleInput">የሰነድ / የሠንጠረዥ ርዕስ (Document Title)</label>
             <input 
                 type="text" 
                 id="documentTitleInput" 
                 class="text-input" 
-                value="የተመዘገቡ አባላት ዝርዝር" 
+                value="የተሳተፉ አባላት ዝርዝር" 
                 placeholder="የሠንጠረዡን ርዕስ ያስገቡ..." 
                 oninput="updateDisplayTitle()"
             >
         </div>
 
         <div class="table-header-tools">
-            <h3 id="tableDynamicTitle">የተመዘገቡ አባላት ዝርዝር</h3>
+            <h3 id="tableDynamicTitle">የተሳተፉ አባላት ዝርዝር</h3>
             <!-- Search Input Feature -->
             <input type="text" id="searchInput" class="search-box" placeholder="በስም፣ በማዕረግ ወይም በሁኔታ ፈልግ..." onkeyup="renderTable()">
         </div>
@@ -543,17 +547,59 @@
     </div>
 
     <script>
-        // Users credentials object (Default values)
-        var userCredentials = {
+        var defaultUserCredentials = {
             "admin": { password: "1234", name: "Admin User", role: "Admin" },
             "user": { password: "1234", name: "Standard User", role: "User" }
         };
 
+        var userCredentials = {};
         var currentUser = null;
         var listData = [];
         var monthsList = ["መስከረም", "ጥቅምት", "ሕዳር", "ታኅሣሥ", "ጥር", "የካቲት", "መጋቢት", "ሚያዝያ", "ግንቦት", "ሰኔ", "ሐምሌ", "ነሐሴ", "ጳጉሜ"];
 
-        // Load saved data from localStorage on startup
+        // Initialize and sync persistent storage
+        function initCredentialsStorage() {
+            var savedCreds = localStorage.getItem('tzidu_user_credentials');
+            if (savedCreds) {
+                try {
+                    userCredentials = JSON.parse(savedCreds);
+                } catch(e) {
+                    userCredentials = JSON.parse(JSON.stringify(defaultUserCredentials));
+                }
+            } else {
+                userCredentials = JSON.parse(JSON.stringify(defaultUserCredentials));
+                localStorage.setItem('tzidu_user_credentials', JSON.stringify(userCredentials));
+            }
+
+            var isModified = localStorage.getItem('tzidu_creds_modified');
+            if (isModified === 'true') {
+                var notice = document.getElementById('defaultCredNotice');
+                if (notice) notice.style.display = 'none';
+            }
+        }
+
+        function saveCredentialsToStorage() {
+            localStorage.setItem('tzidu_user_credentials', JSON.stringify(userCredentials));
+            localStorage.setItem('tzidu_creds_modified', 'true');
+            var notice = document.getElementById('defaultCredNotice');
+            if (notice) notice.style.display = 'none';
+        }
+
+        function checkPersistentSession() {
+            var activeSession = localStorage.getItem('tzidu_active_session');
+            if (activeSession) {
+                try {
+                    var sessionData = JSON.parse(activeSession);
+                    if (userCredentials[sessionData.username]) {
+                        currentUser = sessionData;
+                        applyLoginState();
+                        return true;
+                    }
+                } catch(e) {}
+            }
+            return false;
+        }
+
         function loadSavedData() {
             var saved = localStorage.getItem('tzidu_attendance_records');
             if (saved) {
@@ -565,7 +611,6 @@
             }
         }
 
-        // Save data array to localStorage
         function saveDataToStorage() {
             localStorage.setItem('tzidu_attendance_records', JSON.stringify(listData));
         }
@@ -585,15 +630,18 @@
                     name: userCredentials[u].name,
                     role: userCredentials[u].role
                 };
+                localStorage.setItem('tzidu_active_session', JSON.stringify(currentUser));
+                applyLoginState();
             } else {
                 alert("የተሳሳተ የተጠቃሚ ስም ወይም የይለፍ ቃል!");
-                return;
             }
+        }
 
+        function applyLoginState() {
             document.getElementById('loginModal').style.display = "none";
             document.getElementById('btnLogout').style.display = "inline-block";
             document.getElementById('btnChangePwd').style.display = "inline-block";
-            document.getElementById('lblUser').textContent = currentUser.name;
+            document.getElementById('lblUser').textContent = currentUser.name + " (" + currentUser.username + ")";
             document.getElementById('lblRole').textContent = currentUser.role;
 
             if (currentUser.role === "Admin") {
@@ -607,6 +655,9 @@
 
         function handleLogout() {
             currentUser = null;
+            localStorage.removeItem('tzidu_active_session');
+            document.getElementById('usernameInput').value = "";
+            document.getElementById('passwordInput').value = "";
             document.getElementById('loginModal').style.display = "flex";
             document.getElementById('btnLogout').style.display = "none";
             document.getElementById('btnChangePwd').style.display = "none";
@@ -617,6 +668,8 @@
         }
 
         function openPwdModal() {
+            if (!currentUser) return;
+            document.getElementById('newUsernameInput').value = currentUser.username;
             document.getElementById('oldPwdInput').value = "";
             document.getElementById('newPwdInput').value = "";
             document.getElementById('confirmPwdInput').value = "";
@@ -627,9 +680,10 @@
             document.getElementById('pwdModal').style.display = "none";
         }
 
-        function handleChangePassword() {
+        function handleChangeCredentials() {
             if (!currentUser) return;
 
+            var newUsername = document.getElementById('newUsernameInput').value.trim();
             var oldPwd = document.getElementById('oldPwdInput').value;
             var newPwd = document.getElementById('newPwdInput').value;
             var confirmPwd = document.getElementById('confirmPwdInput').value;
@@ -639,18 +693,39 @@
                 return;
             }
 
-            if (newPwd.trim() === "") {
-                alert("እባክዎን አዲስ የይለፍ ቃል ያስገቡ!");
+            if (newUsername === "") {
+                alert("እባክዎን ተገቢ የተጠቃሚ ስም ያስገቡ!");
                 return;
             }
 
-            if (newPwd !== confirmPwd) {
-                alert("አዲሱ የይለፍ ቃል ከተረጋገጠው ጋር አይመሳሰልም!");
+            if (newUsername !== currentUser.username && userCredentials[newUsername]) {
+                alert("ይህ የተጠቃሚ ስም አስቀድሞ በስራ ላይ ውሏል!");
                 return;
             }
 
-            userCredentials[currentUser.username].password = newPwd;
-            alert("የይለፍ ቃልዎ በተሳካ ሁኔታ ተቀይሯል!");
+            var finalPwd = userCredentials[currentUser.username].password;
+
+            if (newPwd.trim() !== "") {
+                if (newPwd !== confirmPwd) {
+                    alert("አዲሱ የይለፍ ቃል ከተረጋገጠው ጋር አይመሳሰልም!");
+                    return;
+                }
+                finalPwd = newPwd;
+            }
+
+            var userData = userCredentials[currentUser.username];
+            delete userCredentials[currentUser.username];
+
+            userData.password = finalPwd;
+            userCredentials[newUsername] = userData;
+
+            currentUser.username = newUsername;
+
+            saveCredentialsToStorage();
+            localStorage.setItem('tzidu_active_session', JSON.stringify(currentUser));
+
+            document.getElementById('lblUser').textContent = currentUser.name + " (" + currentUser.username + ")";
+            alert("የመግቢያ መረጃዎ በተሳካ ሁኔታ ተቀይሯል!");
             closePwdModal();
         }
 
@@ -862,7 +937,7 @@
                 return;
             }
 
-            var docTitle = document.getElementById('documentTitleInput').value.trim() || "የተመዘገቡ አባላት ዝርዝር";
+            var docTitle = document.getElementById('documentTitleInput').value.trim() || "የተሳተፉ አባላት ዝርዝር";
             var csvText = "\uFEFF" + docTitle + "\n\nተ.ቁ,ማዕረግ,ሙሉ ስም,ጾታ,የአባልነት ሁኔታ,የኃላፊነት ሚና,ቀን,የመገኘት ሁኔታ,ፊርማ\n";
             for (var i = 0; i < listData.length; i++) {
                 var o = listData[i];
@@ -915,11 +990,15 @@
             renderTable();
         };
 
-        // Initialize UI & Data
+        // App Initialization Sequence
+        initCredentialsStorage();
         loadSavedData();
         buildMonthChips();
         buildDayChips(30);
-        renderTable();
+        
+        if (!checkPersistentSession()) {
+            document.getElementById('loginModal').style.display = "flex";
+        }
     </script>
 </body>
 </html>
